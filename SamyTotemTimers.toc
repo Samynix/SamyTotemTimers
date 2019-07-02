@@ -1,0 +1,8 @@
+## Interface: 11302
+## Version: v1.0
+## Title: SamyTotemTimers
+## Notes: Stuffs
+## SavedVariablesPerCharacter: SamyTotemTimersDB
+## Author: Samynix
+
+SamyTotemTimers.xml
