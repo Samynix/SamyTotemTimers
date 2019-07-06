@@ -30,7 +30,6 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
     button:SetPoint("BOTTOMLEFT", parentFrame, "BOTTOMLEFT", realtiveX, 0);
-    button:RegisterForDrag('LeftButton')
     button:SetScript("OnDragStart", function (self)
         self:GetParent():SetMovable(true)
         self:GetParent():StartMoving()
@@ -74,7 +73,16 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
                 button:SetAlpha(1)
             end
         end
+    end
 
+    function buttonWrapper:SetDraggable(isDraggable)
+        if (isDraggable) then
+            button:RegisterForDrag('LeftButton')
+            ActionButton_ShowOverlayGlow(button)
+        else
+            button:RegisterForDrag(nil)
+            ActionButton_HideOverlayGlow(button)
+        end
     end
 
     return buttonWrapper
@@ -88,7 +96,7 @@ function SamyTotemTimerSelectTotemButton:Create(samyTotemTimerTotemButton, butto
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
 
-    --RegisterStateDriver(button, 'visibility', '[combat]hide')
+    RegisterStateDriver(button, 'visibility', '[combat]hide')
 
     local buttonWrapper = SamyTotemTimerButtonWrapper:New(button)
     buttonWrapper.spell = spell

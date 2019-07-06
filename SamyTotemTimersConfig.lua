@@ -3,6 +3,7 @@ local _instance = nil
 local _samyTotemTimers = nil
 local _mainFrame = nil
 local _totemLists = nil
+local _isLocked = true
 
 function SamyTotemTimersConfig:Instance()
     if (_instance == nil) then
@@ -14,7 +15,7 @@ function SamyTotemTimersConfig:Instance()
             handler = _instance,
             args = {
                 reset = {
-                    order = 2,
+                    order = 10,
                     type = 'execute',
                     name = "Reset",
                     func = 'ResetConfig'
@@ -30,6 +31,13 @@ function SamyTotemTimersConfig:Instance()
                     bigStep = 0.1,
                     set = 'SetScale',
                     get = 'GetScale'
+                },
+
+                lock = {
+                    order = 2,
+                    type = 'execute',
+                    name = "Lock/Unlock",
+                    func = 'ToggleLock',
                 },
 
                 keybinds = {
@@ -79,7 +87,7 @@ function SamyTotemTimersConfig:Instance()
         }
 
         local ACD3 = LibStub("AceConfigDialog-3.0")
-        LibStub("AceConfig-3.0"):RegisterOptionsTable("SamyTotemTimers", options)
+        LibStub("AceConfig-3.0"):RegisterOptionsTable("SamyTotemTimers", options, {"stt", "samytotemtimers"})
         local optFrame = ACD3:AddToBlizOptions("SamyTotemTimers", "SamyTotemTimers")
 
         function _instance:GetKeybinding(info)
@@ -116,6 +124,19 @@ function SamyTotemTimersConfig:Instance()
             end
 
             return ref
+        end
+
+        function _instance:ToggleLock()
+            for k, v in pairs(_totemLists) do
+                v:SetDraggable(_isLocked)
+            end
+
+            _isLocked = not _isLocked
+            if (_isLocked) then
+                print('Frame locked')
+            else
+                print('Frame unlocked')
+            end
         end
 
         local function CheckDatabase(isOverride)
@@ -168,17 +189,21 @@ function SamyTotemTimersConfig:Instance()
             ["Water"] = {
                 "Healing Stream Totem",
                 "Mana Spring Totem",
+                "Fire Resistance Totem",
+                "Mana Tide Totem",
                 "Disease Cleansing Totem",
                 "Poison Cleansing Totem",
-                "Mana Tide Totem",
             },
 
             ["AirIndex"] = 4,
             ["Air"] = {
-                "Grounding Totem",
+                "Grace of Air Totem",
                 "Nature Resistance Totem",
+                "Windwall Totem",
                 "Windfury Totem",
+                "Grounding Totem",
                 "Sentry Totem",
+                "Tranquil Air Totem"
             }
         }
     end

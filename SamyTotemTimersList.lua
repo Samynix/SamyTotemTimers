@@ -24,9 +24,7 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     
     for k, v in pairs(_config.totems[totemType]) do
         local selectTotemButton = SamyTotemTimerSelectTotemButton:Create(_dropTotemButton, _config.buttonSize, v)
-        --selectTotemButton.buttonFrame:RegisterForClicks('LeftButton', 'RightButton')
         selectTotemButton.buttonFrame:SetScript("OnClick", function(self, button) 
-            print(self, button)
             if (UnitAffectingCombat('player')) then
                 return
             end
@@ -38,15 +36,8 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
         table.insert(_selectTotemTable, selectTotemButton)
     end
 
-    function _instance:Test(alpha)
-        for k, v in pairs(_selectTotemTable) do
-           v.buttonFrame:SetAlpha(alpha)
-           if (alpha > 0) then
-                v.buttonFrame:SetSize(36, 36)
-           else
-                v.buttonFrame:SetSize(0, 0)
-           end
-        end
+    function _instance:SetDraggable(isDraggable)
+        _dropTotemButton:SetDraggable(isDraggable)
     end
 
     function _instance:Refresh(isShowSelectList)

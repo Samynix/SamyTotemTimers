@@ -1,8 +1,6 @@
 local ADDON_NAME = "SamyTotemTimers"
 local UPDATE_RATE = 0.3
 
-local _testTotemTimersList = nil
-
 local _samyTotemTimers = {}
 local _config = SamyTotemTimersConfig.Instance()
 local _timeSinceLastUpdate = 0
@@ -27,8 +25,6 @@ function _samyTotemTimers:Init()
         ["Water"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 2, "Water"),
         ["Air"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 3, "Air")
     }
-
-    _testTotemTimersList = totemLists
 
     mainFrame:SetScript("OnEvent",
         function (self, event, ...)
@@ -128,9 +124,3 @@ end
 
 
 _samyTotemTimers:Init()
-
-function SamyTotemTest(alpha)
-    for k, v in pairs(_testTotemTimersList) do
-        v:Test(alpha)
-    end
-end
