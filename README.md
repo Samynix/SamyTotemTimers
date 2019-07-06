@@ -14,3 +14,5 @@ Commands:\
 /stt lock (Toggles frame lock)\
 /stt reset (Resets everything except keybindings)\
 /stt scale (Size of frame)\
+
+![Options img missing](img/options.PNG?raw=true "Options")
