@@ -1,4 +1,5 @@
 Slash commands /stt or /samytotemtimers
+
 Configuration can also be found in Interface Options/Addons/SamyTotemTimers
 
 Commands:
