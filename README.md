@@ -1,7 +1,9 @@
 Simple totembar for all elements.\
 Four action buttons with select list\
+
 Shows cooldown of selected totem.\
 ![totemCds img missing](img/totemCds.png?raw=true "Totem cooldowns")\
+
 Shows time left of active totem.\
 ![activeTotems img missing](img/activeTotems.png?raw=true "Active Totems")
 
@@ -17,5 +19,4 @@ Commands:\
 /stt lock (Toggles frame lock)\
 /stt reset (Resets everything except keybindings)\
 /stt scale (Size of frame)\
-
 ![options img missing](img/options.png?raw=true "Options")
