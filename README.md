@@ -15,4 +15,4 @@ Commands:\
 /stt reset (Resets everything except keybindings)\
 /stt scale (Size of frame)\
 
-![Options img missing](img\options.PNG?raw=true "Options")
+![Options img missing](img/options.PNG?raw=true "Options")
