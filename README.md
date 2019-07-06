@@ -3,12 +3,12 @@ Four action buttons with select list\
 Shows cooldown of selected totem.\
 ![totemCds img missing](img/totemCds.png?raw=true "Totem cooldowns")\
 Shows time left of active totem.\
-![activeTotems img missing](img/activeTotems.png?raw=true "Active Totems")\
+![activeTotems img missing](img/activeTotems.png?raw=true "Active Totems")
 
 RightButton brings up select list\
 Left button on select list selects totem\
 Can only switch totems out of combat.\
-![selectTotems img missing](img/selectTotems.png?raw=true "Select totem list")\
+![selectTotems img missing](img/selectTotems.png?raw=true "Select totem list")
 
 Slash commands /stt or /samytotemtimers\\
 Configuration can also be found in Interface Options/Addons/SamyTotemTimers\
