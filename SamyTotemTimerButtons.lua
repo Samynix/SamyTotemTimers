@@ -1,41 +1,31 @@
 local SamyTotemTimerButtonWrapper = {}
-local config = SamyTotemTimersConfig:Instance()
+local _config = SamyTotemTimersConfig:Instance()
 
 function SamyTotemTimerButtonWrapper:New(buttonFrame)
-    local instance = {}
+    local _instance = {}
 
-    instance.buttonFrame = buttonFrame
-    instance.mouseUpRightButton = nil
-    instance.mouseUpLeftButton = nil
-    instance.buttonFrame:SetScript("OnMouseUp", function(self, buttonPressed) 
-        if (buttonPressed == "LeftButton" and instance.mouseUpLeftButton) then
-            instance.mouseUpLeftButton(self)
-        elseif (buttonPressed == "RightButton" and instance.mouseUpRightButton) then
-            instance.mouseUpRightButton(self)
+    _instance.buttonFrame = buttonFrame
+    _instance.mouseUpRightButton = nil
+    _instance.mouseUpLeftButton = nil
+    _instance.buttonFrame:SetScript("OnMouseUp", function(self, buttonPressed) 
+        if (buttonPressed == "LeftButton" and _instance.mouseUpLeftButton) then
+            _instance.mouseUpLeftButton(self)
+        elseif (buttonPressed == "RightButton" and _instance.mouseUpRightButton) then
+            _instance.mouseUpRightButton(self)
         end
     end)
 
-    function instance:SetSpell(spell, isSave) 
-        instance.buttonFrame:SetAttribute("type", "spell");
-        instance.buttonFrame:SetAttribute("spell", spell);
-
-        instance.spell = spell
-        if (isSave) then
-            config.db.lastUsedSpells[instance.buttonFrame:GetName()] = spell
+    function _instance:UpdateCooldown()
+        if (_instance.spell and _instance.buttonFrame.cooldown) then
+            CooldownFrame_Set(_instance.buttonFrame.cooldown,  GetSpellCooldown(_instance.spell))
         end
     end
 
-    function instance:UpdateCooldown()
-        if (instance.spell and instance.buttonFrame.cooldown) then
-            CooldownFrame_Set(instance.buttonFrame.cooldown,  GetSpellCooldown(instance.spell))
-        end
-    end
-
-    return instance
+    return _instance
 end
 
 SamyTotemTimerTotemButton = {}
-function SamyTotemTimerTotemButton:New(parentFrame, buttonSize, realtiveX, buttonName)
+function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, buttonName)
     local button = CreateFrame("Button", parentFrame:GetName() .. buttonName, parentFrame, "ActionButtonTemplate, SecureActionButtonTemplate")
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
@@ -63,33 +53,63 @@ function SamyTotemTimerTotemButton:New(parentFrame, buttonSize, realtiveX, butto
             self.icon:SetTexture(spellId)
         end
     end)
-    
-    return SamyTotemTimerButtonWrapper:New(button)
+
+    local buttonWrapper = SamyTotemTimerButtonWrapper:New(button)
+    function buttonWrapper:SetSpell(spell, isSave) 
+        button:SetAttribute("type", "spell");
+        button:SetAttribute("spell", spell);
+
+        buttonWrapper.spell = spell
+        if (isSave) then
+            _config.db.lastUsedSpells[button:GetName()] = spell
+        end
+    end
+
+    function buttonWrapper:UpdateSpellUsable()
+        if (buttonWrapper.spell) then 
+            local isUsable, noMana = IsUsableSpell(buttonWrapper.spell)
+            if (not isUsable or noMana) then
+               button:SetAlpha(0.4)
+            else
+                button:SetAlpha(1)
+            end
+        end
+
+    end
+
+    return buttonWrapper
 end
 
 SamyTotemTimerSelectTotemButton = {}
-function SamyTotemTimerSelectTotemButton:New(samyTotemTimerTotemButton, buttonSize, spell)
+function SamyTotemTimerSelectTotemButton:Create(samyTotemTimerTotemButton, buttonSize, spell)
     local parentFrame = samyTotemTimerTotemButton.buttonFrame
-    local button = CreateFrame("Button", parentFrame:GetName() .. spell, parentFrame, "ActionButtonTemplate")
+    local button = CreateFrame("Button", parentFrame:GetName() .. spell, parentFrame, "ActionButtonTemplate, SecureActionButtonTemplate")
     button:SetFrameStrata("TOOLTIP")
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
-    button.icon:SetTexture(select(3, GetSpellInfo(spell)))
-    
+
+    --RegisterStateDriver(button, 'visibility', '[combat]hide')
+
     local buttonWrapper = SamyTotemTimerButtonWrapper:New(button)
     buttonWrapper.spell = spell
+
+    function buttonWrapper:ADDON_LOADED()
+        local spellId = select(3, GetSpellInfo(spell))
+        button.icon:SetTexture(spellId)
+    end
+
     return buttonWrapper
 end
 
 SamyTotemTimerActiveTotemButton = {}
-function SamyTotemTimerActiveTotemButton:New(samyTotemTimerTotemButton, buttonSize, buttonName)
+function SamyTotemTimerActiveTotemButton:Create(samyTotemTimerTotemButton, buttonSize, buttonName)
     local parentFrame = samyTotemTimerTotemButton.buttonFrame
     local name = parentFrame:GetName() .. buttonName .. "Active"
     local button = CreateFrame("Frame", name, parentFrame, "ActionButtonTemplate", "Background")
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
     
-    local tY = buttonSize * config.buttonSpacingMultiplier
+    local tY = buttonSize * _config.buttonSpacingMultiplier
     button:SetPoint("BOTTOMLEFT", parentFrame, "TOPLEFT", 0, tY);
     button:Hide()
 
