@@ -1,8 +1,8 @@
 Simple totembar for all elements.\
-Four action buttons with select list\
+Four action buttons with select list
 
 Shows cooldown of selected totem.\
-![totemCds img missing](img/totemCds.png?raw=true "Totem cooldowns")\
+![totemCds img missing](img/totemCds.png?raw=true "Totem cooldowns")
 
 Shows time left of active totem.\
 ![activeTotems img missing](img/activeTotems.png?raw=true "Active Totems")
@@ -13,7 +13,7 @@ Can only switch totems out of combat.\
 ![selectTotems img missing](img/selectTotems.png?raw=true "Select totem list")
 
 Slash commands /stt or /samytotemtimers\\
-Configuration can also be found in Interface Options/Addons/SamyTotemTimers\
+Configuration can also be found in Interface Options/Addons/SamyTotemTimers
 
 Commands:\
 /stt lock (Toggles frame lock)\
