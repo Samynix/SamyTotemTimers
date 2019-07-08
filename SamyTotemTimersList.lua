@@ -9,6 +9,9 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     local _selectTotemTable = {}
 
     local _foundSpells = false
+    local _setFirstDiscoveredSpell = nil
+
+    local _isUnlocked = false
 
     _dropTotemButton = SamyTotemTimerTotemButton:Create(parentFrame, _config.buttonSize, relativeX, totemType)
     _dropTotemButton.mouseUpRightButton = function(self)
@@ -29,7 +32,7 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
                 return
             end
 
-            _dropTotemButton:SetSpell(selectTotemButton.spell, true)
+            _foundSpells = _dropTotemButton:SetSpellIfKnown(selectTotemButton.spell, true)
             _instance:Refresh(false)
         end)
 
@@ -37,6 +40,7 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     end
 
     function _instance:SetDraggable(isDraggable)
+        _isUnlocked = isDraggable
         _dropTotemButton:SetDraggable(isDraggable)
     end
 
@@ -55,7 +59,7 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
                 end
 
                 if (not _dropTotemButton.spell) then
-                    _dropTotemButton.SetSpell(v.spell)
+                    _foundSpells = _dropTotemButton:SetSpellIfKnown(_dropTotemButton.spell)
                 end
             end
         end
@@ -73,10 +77,15 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     end
 
     function _instance:OnUpdate()
-        if (not _foundSpells) then
-            if (GetSpellBookItemInfo('Lightning Bolt')) then
-                _foundSpells = true
+        if (not UnitAffectingCombat('player')) then
+            if (not _foundSpells) then
+                if (not _isUnlocked and _dropTotemButton.buttonFrame:IsVisible()) then
+                    _dropTotemButton.buttonFrame:Hide()
+                end
+                
                 _instance:LoadSavedVariables()
+            elseif (not _dropTotemButton.buttonFrame:IsVisible()) then
+                _dropTotemButton.buttonFrame:Show()
             end
         end
 
@@ -95,12 +104,13 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
 
     function _instance:LoadSavedVariables()
         local savedSpell = _config.db.lastUsedSpells[_dropTotemButton.buttonFrame:GetName()]
-        if (savedSpell and GetSpellBookItemInfo(savedSpell)) then
-            _dropTotemButton:SetSpell(savedSpell)
+        if (savedSpell and _dropTotemButton:SetSpellIfKnown(savedSpell)) then
+            _foundSpells = true
+            
         else
             for k, v in pairs(_selectTotemTable) do
-                if (GetSpellBookItemInfo(v.spell)) then
-                    _dropTotemButton:SetSpell(v.spell)
+                if (_dropTotemButton:SetSpellIfKnown(v.spell)) then
+                    _foundSpells = true
                     return
                 end
             end

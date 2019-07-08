@@ -54,14 +54,24 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
     end)
 
     local buttonWrapper = SamyTotemTimerButtonWrapper:New(button)
-    function buttonWrapper:SetSpell(spell, isSave) 
-        button:SetAttribute("type", "spell");
-        button:SetAttribute("spell", spell);
-
-        buttonWrapper.spell = spell
-        if (isSave) then
-            _config.db.lastUsedSpells[button:GetName()] = spell
+    function buttonWrapper:SetSpellIfKnown(spell, isSave) 
+        if (not spell or spell == '') then
+            return false
         end
+
+        if (GetSpellBookItemInfo(spell)) then
+            button:SetAttribute("type", "spell");
+            button:SetAttribute("spell", spell);
+    
+            buttonWrapper.spell = spell
+            if (isSave) then
+                _config.db.lastUsedSpells[button:GetName()] = spell
+            end
+
+            return true
+        end
+
+        return false
     end
 
     function buttonWrapper:UpdateSpellUsable()
@@ -77,6 +87,10 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
 
     function buttonWrapper:SetDraggable(isDraggable)
         if (isDraggable) then
+            if (not button:IsVisible()) then
+                button:Show()
+            end
+            
             button:RegisterForDrag('LeftButton')
             ActionButton_ShowOverlayGlow(button)
         else

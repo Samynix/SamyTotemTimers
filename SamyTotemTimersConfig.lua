@@ -119,7 +119,7 @@ function SamyTotemTimersConfig:Instance()
         end
 
         local function SetDefault(ref, default, isOverride)
-            if (not ref or isOverride) then
+            if (ref == nil or isOverride) then
                 return default
             end
 
@@ -141,12 +141,14 @@ function SamyTotemTimersConfig:Instance()
 
         local function CheckDatabase(isOverride)
             SamyTotemTimersDB = SetDefault(SamyTotemTimersDB, {}, isOverride)
+            SamyTotemTimersDB.isFirstLoad  = SetDefault(SamyTotemTimersDB.isFirstLoad, true, isOverride)
             SamyTotemTimersDB.scale = SetDefault(SamyTotemTimersDB.scale, 1, isOverride)
             SamyTotemTimersDB.lastUsedSpells = SetDefault(SamyTotemTimersDB.lastUsedSpells, {}, isOverride)
             SamyTotemTimersDB.position = SetDefault(SamyTotemTimersDB.position, {}, isOverride)
             SamyTotemTimersDB.position.x = SetDefault(SamyTotemTimersDB.position.x, 0, isOverride)
             SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isOverride)
             SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isOverride)
+
 
             _instance.db = SamyTotemTimersDB
         end
@@ -162,6 +164,10 @@ function SamyTotemTimersConfig:Instance()
             _totemLists = eventArgs.totemLists
 
             CheckDatabase()
+            if (SamyTotemTimersDB.isFirstLoad == true) then
+                SamyTotemTimersDB.isFirstLoad = false
+                _instance:ToggleLock()
+            end
         end
 
         _instance.buttonSize = 36
