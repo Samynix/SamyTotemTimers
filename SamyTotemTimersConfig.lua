@@ -14,6 +14,14 @@ function SamyTotemTimersConfig:Instance()
             type = 'group',
             handler = _instance,
             args = {
+                twist = {
+                    order = 11,
+                    type = 'toggle',
+                    name = "Show twist totem",
+                    set = 'SetTwist',
+                    get = 'GetTwist'
+                },
+
                 reset = {
                     order = 10,
                     type = 'execute',
@@ -80,6 +88,15 @@ function SamyTotemTimersConfig:Instance()
                             set = 'SetKeybinding',
                             get = 'GetKeybinding',
                         },
+
+                        twist = {
+                            order = 5,
+                            type = 'keybinding',
+                            name = 'Twist',
+                            desc = 'Keybinding for twist totem',
+                            set = 'SetKeybinding',
+                            get = 'GetKeybinding',
+                        },
                     }
                     
                 }
@@ -89,6 +106,17 @@ function SamyTotemTimersConfig:Instance()
         local ACD3 = LibStub("AceConfigDialog-3.0")
         LibStub("AceConfig-3.0"):RegisterOptionsTable("SamyTotemTimers", options, {"stt", "samytotemtimers"})
         local optFrame = ACD3:AddToBlizOptions("SamyTotemTimers", "SamyTotemTimers")
+
+        function _instance:GetTwist(info)
+            return self.db.isTwist
+        end
+
+        function _instance:SetTwist(into, value)
+            self.db.isTwist = value
+            if (_totemLists["Twist"]) then
+                _totemLists["Twist"]:UpdateVisibility(value)
+            end
+        end
 
         function _instance:GetKeybinding(info)
             local bindingName = format('CLICK %s:%s', _totemLists[info.option.name].DropTotemButton.buttonFrame:GetName(), GetCurrentBindingSet())
@@ -203,6 +231,33 @@ function SamyTotemTimersConfig:Instance()
 
             ["AirIndex"] = 4,
             ["Air"] = {
+                "Grace of Air Totem",
+                "Nature Resistance Totem",
+                "Windwall Totem",
+                "Windfury Totem",
+                "Grounding Totem",
+                "Sentry Totem",
+                "Tranquil Air Totem"
+            },
+
+            ["TwistIndex"] = 5,
+            ["Twist"] = {
+                "Stoneskin Totem",
+                "Earthbind Totem",
+                "Stoneclaw Totem",
+                "Strength of Earth Totem",
+                "Tremor Totem",
+                "Searing Totem",
+                "Fire Nova Totem",
+                "Frost Resistance Totem",
+                "Magma Totem",
+                "Flametongue Totem",
+                "Healing Stream Totem",
+                "Mana Spring Totem",
+                "Fire Resistance Totem",
+                "Mana Tide Totem",
+                "Disease Cleansing Totem",
+                "Poison Cleansing Totem",
                 "Grace of Air Totem",
                 "Nature Resistance Totem",
                 "Windwall Totem",

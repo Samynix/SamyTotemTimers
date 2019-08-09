@@ -13,6 +13,8 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
 
     local _isUnlocked = false
 
+    local _isShow = true
+
     _dropTotemButton = SamyTotemTimerTotemButton:Create(parentFrame, _config.buttonSize, relativeX, totemType)
     _dropTotemButton.mouseUpRightButton = function(self)
         if (UnitAffectingCombat('player')) then
@@ -42,6 +44,15 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     function _instance:SetDraggable(isDraggable)
         _isUnlocked = isDraggable
         _dropTotemButton:SetDraggable(isDraggable)
+    end
+
+    function _instance:UpdateVisibility(isVisible)
+        _isShow = isVisible
+        if (isVisible) then
+            _dropTotemButton.buttonFrame:Show()
+        else
+            _dropTotemButton.buttonFrame:Hide()
+        end
     end
 
     function _instance:Refresh(isShowSelectList)
@@ -84,7 +95,7 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
                 end
                 
                 _instance:LoadSavedVariables()
-            elseif (not _dropTotemButton.buttonFrame:IsVisible()) then
+            elseif (_isShow and not _dropTotemButton.buttonFrame:IsVisible()) then
                 _dropTotemButton.buttonFrame:Show()
             end
         end

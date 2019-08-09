@@ -23,7 +23,8 @@ function _samyTotemTimers:Init()
         ["Earth"] = SamyTotemTimerList:New(mainFrame, 0, "Earth"),
         ["Fire"] = SamyTotemTimerList:New(mainFrame, buttonRectangle, "Fire"),
         ["Water"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 2, "Water"),
-        ["Air"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 3, "Air")
+        ["Air"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 3, "Air"),
+        ["Twist"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 4, "Twist")
     }
 
     mainFrame:SetScript("OnEvent",
@@ -78,6 +79,8 @@ function _samyTotemTimers:LoadSavedVariables(frame, totemLists)
             v["LoadSavedVariables"]()
         end
     end
+
+    totemLists["Twist"]:UpdateVisibility(_config.db.isTwist)
 end
 
 function _samyTotemTimers:SPELLS_CHANGED(eventArgs)
