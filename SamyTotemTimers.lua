@@ -127,3 +127,45 @@ end
 
 
 _samyTotemTimers:Init()
+
+
+function Temp_SetTimerText(frame, spell, isSpellDuration)
+    if (not frame.timerBackgroundTexture) then
+        frame.timerBackgroundTexture = frame:CreateTexture(nil,"OVERLAY")
+        frame.timerBackgroundTexture:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        frame.timerBackgroundTexture:SetPoint("TOPLEFT",1.5,-15)
+        frame.timerBackgroundTexture:SetPoint("BOTTOMRIGHT",1.5,5)
+        frame.timerBackgroundTexture:SetAlpha(0.4)
+    end
+
+    if (not frame.fontString) then
+        frame.fontString = frame:CreateFontString(frame:GetName() .. "TimerText", "OVERLAY", "GameFontHighlight")
+        frame.fontString:SetFont("Fonts\\FRIZQT__.TTF", 15)
+        frame.fontString:SetPoint("CENTER", frame.timerBackgroundTexture, "CENTER")
+    end
+
+   -- print(spell)
+
+    local isShowFrames = false
+    if (not isSpellDuration) then
+        local start, duration, enabled = GetSpellCooldown(spell);
+        if (enabled) then
+            local timeDiff = GetTime() - start
+            local timeLeft = duration - timeDiff
+
+            local d, h, m, s = ChatFrame_TimeBreakDown(timeLeft)
+            frame.fontString:SetFormattedText("%01d:%02d", m, s)
+            isShowFrames = timeLeft > 0
+        end
+    end
+
+    if (isShowFrames and not frame.timerBackgroundTexture:IsVisible()) then
+        frame.timerBackgroundTexture:Show()
+        frame.fontString:Show()
+    elseif (not isShowFrames and frame.timerBackgroundTexture:IsVisible()) then
+        frame.timerBackgroundTexture:Hide()
+        frame.fontString:Hide()
+    end
+
+    return isShowFrames
+end
