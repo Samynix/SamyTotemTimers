@@ -1,5 +1,6 @@
 local SamyTotemTimerButtonWrapper = {}
 local _config = SamyTotemTimersConfig:Instance()
+local AceEvent = LibStub("AceEvent-3.0")
 
 function SamyTotemTimerButtonWrapper:New(buttonFrame)
     local _instance = {}
@@ -21,12 +22,39 @@ function SamyTotemTimerButtonWrapper:New(buttonFrame)
         end
     end
 
+    _instance.buttonFrame:HookScript('OnEnter', function(self, motion)
+        if (_instance.spell) then
+            GameTooltip:SetOwner(self)
+            local numOfSpellTabs = GetNumSpellTabs()
+            for i = 1, numOfSpellTabs, 1 do
+                local name, texture, offset, numSpells = GetSpellTabInfo(i);
+                
+                for j = offset + numSpells, offset+1, -1 do
+                    local type, bookSpellId = GetSpellBookItemInfo(j, BOOKTYPE_SPELL)
+                    local spellName = GetSpellInfo(bookSpellId)
+                    if (_instance.spell == spellName) then
+                        GameTooltip:SetSpellBookItem(j, BOOKTYPE_SPELL)
+                        GameTooltip:Show()
+                        return
+                    end
+                end
+            end
+        end
+    end)
+
+    _instance.buttonFrame:HookScript('OnLeave', function(self, motion)
+        if (GameTooltip:GetOwner() == self) then
+            GameTooltip:Hide()
+        end
+    end)
+
     return _instance
 end
 
 SamyTotemTimerTotemButton = {}
 function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, buttonName)
     local button = CreateFrame("Button", parentFrame:GetName() .. buttonName, parentFrame, "ActionButtonTemplate, SecureActionButtonTemplate")
+
     button:SetWidth(buttonSize)
     button:SetHeight(buttonSize)
     button:SetPoint("BOTTOMLEFT", parentFrame, "BOTTOMLEFT", realtiveX, 0);
@@ -116,8 +144,8 @@ function SamyTotemTimerSelectTotemButton:Create(samyTotemTimerTotemButton, butto
     buttonWrapper.spell = spell
 
     function buttonWrapper:ADDON_LOADED()
-        local spellId = select(3, GetSpellInfo(spell))
-        button.icon:SetTexture(spellId)
+        local texture = select(3, GetSpellInfo(spell))
+        button.icon:SetTexture(texture)
     end
 
     return buttonWrapper
