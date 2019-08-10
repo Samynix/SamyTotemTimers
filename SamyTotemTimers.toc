@@ -1,5 +1,5 @@
 ## Interface: 11302
-## Version: v1.2
+## Version: v1.3
 ## Title: SamyTotemTimers
 ## Notes: Stuffs
 ## SavedVariablesPerCharacter: SamyTotemTimersDB
