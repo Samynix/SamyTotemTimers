@@ -203,68 +203,68 @@ function SamyTotemTimersConfig:Instance()
         _instance.totems = { 
             ["EarthIndex"] = 2,
             ["Earth"] = {
-                "Stoneskin Totem",
-                "Earthbind Totem",
-                "Stoneclaw Totem",
-                "Strength of Earth Totem",
-                "Tremor Totem"
+                8071, --"Stoneskin Totem",
+                2484, --"Earthbind Totem",
+                5730, --"Stoneclaw Totem",
+                8075, --"Strength of Earth Totem",
+                8143, --"Tremor Totem"
             }, 
         
             ["FireIndex"] = 1,
             ["Fire"] = {
-                "Searing Totem",
-                "Fire Nova Totem",
-                "Frost Resistance Totem",
-                "Magma Totem",
-                "Flametongue Totem"
+                3599, --"Searing Totem",
+                1535, --"Fire Nova Totem",
+                8181, --"Frost Resistance Totem",
+                8190, --"Magma Totem",
+                8227, --"Flametongue Totem"
             },
 
             ["WaterIndex"] = 3,
             ["Water"] = {
-                "Healing Stream Totem",
-                "Mana Spring Totem",
-                "Fire Resistance Totem",
-                "Mana Tide Totem",
-                "Disease Cleansing Totem",
-                "Poison Cleansing Totem",
+                5394, --"Healing Stream Totem",
+                5675, --"Mana Spring Totem",
+                8184, --"Fire Resistance Totem",
+                16190, --"Mana Tide Totem",
+                8170, --"Disease Cleansing Totem",
+                8166, --"Poison Cleansing Totem",
             },
 
             ["AirIndex"] = 4,
             ["Air"] = {
-                "Grace of Air Totem",
-                "Nature Resistance Totem",
-                "Windwall Totem",
-                "Windfury Totem",
-                "Grounding Totem",
-                "Sentry Totem",
-                "Tranquil Air Totem"
+                8835, --"Grace of Air Totem",
+                10595, --"Nature Resistance Totem",
+                15107, --"Windwall Totem",
+                8512, --"Windfury Totem",
+                8177, --"Grounding Totem",
+                6495, --"Sentry Totem",
+                25908, --"Tranquil Air Totem"
             },
 
             ["TwistIndex"] = 5,
             ["Twist"] = {
-                "Stoneskin Totem",
-                "Earthbind Totem",
-                "Stoneclaw Totem",
-                "Strength of Earth Totem",
-                "Tremor Totem",
-                "Searing Totem",
-                "Fire Nova Totem",
-                "Frost Resistance Totem",
-                "Magma Totem",
-                "Flametongue Totem",
-                "Healing Stream Totem",
-                "Mana Spring Totem",
-                "Fire Resistance Totem",
-                "Mana Tide Totem",
-                "Disease Cleansing Totem",
-                "Poison Cleansing Totem",
-                "Grace of Air Totem",
-                "Nature Resistance Totem",
-                "Windwall Totem",
-                "Windfury Totem",
-                "Grounding Totem",
-                "Sentry Totem",
-                "Tranquil Air Totem"
+                8071, --"Stoneskin Totem",
+                2484, --"Earthbind Totem",
+                5730, --"Stoneclaw Totem",
+                8075, --"Strength of Earth Totem",
+                8143, --"Tremor Totem"
+                3599, --"Searing Totem",
+                1535, --"Fire Nova Totem",
+                8181, --"Frost Resistance Totem",
+                8190, --"Magma Totem",
+                8227, --"Flametongue Totem"
+                5394, --"Healing Stream Totem",
+                5675, --"Mana Spring Totem",
+                8184, --"Fire Resistance Totem",
+                16190, --"Mana Tide Totem",
+                8170, --"Disease Cleansing Totem",
+                8166, --"Poison Cleansing Totem",
+                8835, --"Grace of Air Totem",
+                10595, --"Nature Resistance Totem",
+                15107, --"Windwall Totem",
+                8512, --"Windfury Totem",
+                8177, --"Grounding Totem",
+                6495, --"Sentry Totem",
+                25908, --"Tranquil Air Totem"
             }
         }
     end

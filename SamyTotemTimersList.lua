@@ -28,7 +28,8 @@ function SamyTotemTimerList:New(parentFrame, relativeX, totemType)
     _activeTotemButton = SamyTotemTimerActiveTotemButton:Create(_dropTotemButton, _config.buttonSize, totemType)
     
     for k, v in pairs(_config.totems[totemType]) do
-        local selectTotemButton = SamyTotemTimerSelectTotemButton:Create(_dropTotemButton, _config.buttonSize, v)
+        local spellName = GetSpellInfo(v)
+        local selectTotemButton = SamyTotemTimerSelectTotemButton:Create(_dropTotemButton, _config.buttonSize, spellName)
         selectTotemButton.buttonFrame:SetScript("OnClick", function(self, button) 
             if (UnitAffectingCombat('player')) then
                 return
