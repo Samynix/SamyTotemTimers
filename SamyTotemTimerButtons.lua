@@ -1,6 +1,5 @@
 local SamyTotemTimerButtonWrapper = {}
 local _config = SamyTotemTimersConfig:Instance()
-local AceEvent = LibStub("AceEvent-3.0")
 
 function SamyTotemTimerButtonWrapper:New(buttonFrame)
     local _instance = {}
