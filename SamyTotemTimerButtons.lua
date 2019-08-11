@@ -113,9 +113,11 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
         end
     end
 
+    local _wasVisible --refactor soon
     function buttonWrapper:SetDraggable(isDraggable)
         if (isDraggable) then
-            if (not button:IsVisible()) then
+            _wasVisible = button:IsVisible()
+            if (not _wasVisible) then
                 button:Show()
             end
             
@@ -124,6 +126,10 @@ function SamyTotemTimerTotemButton:Create(parentFrame, buttonSize, realtiveX, bu
         else
             button:RegisterForDrag(nil)
             ActionButton_HideOverlayGlow(button)
+
+            if (not _wasVisible) then
+                button:Hide()
+            end
         end
     end
 
