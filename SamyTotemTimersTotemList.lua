@@ -117,7 +117,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
                 local checkY = topOfParent + posY + (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING) * 3
                 if (checkY >= topOfScreen) then
                     multiplier = -1
-                    posY = -(SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING) * 2
+                    posY = -(SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING) * 2.5
                 end
 
                 posY = posY + (multiplier * (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING))

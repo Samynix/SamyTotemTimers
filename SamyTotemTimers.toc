@@ -1,5 +1,5 @@
 ## Interface: 11302
-## Version: v2.0
+## Version: v2.2
 ## Title: SamyTotemTimers
 ## Notes: Stuffs
 ## SavedVariablesPerCharacter: SamyTotemTimersDB
@@ -10,6 +10,7 @@ Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceAddon-3.0\AceAddon-3.0.xml
 
 SamyTotemTimers.xml
