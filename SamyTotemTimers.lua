@@ -1,171 +1,120 @@
-local ADDON_NAME = "SamyTotemTimers"
-local UPDATE_RATE = 0.3
+local _samyTotemTimers = LibStub("AceAddon-3.0"):NewAddon("SamyTotemTimers", "AceEvent-3.0")
 
-local _samyTotemTimers = {}
-local _config = SamyTotemTimersConfig.Instance()
-local _timeSinceLastUpdate = 0
-local _addonLoaded = false
+local _totemLists = {}
+local _isUpdateTotemLists = false
 
-if not SaveBindings then
-    function SaveBindings(p)
-        AttemptToSaveBindings(p)
-    end
+local function IsPlayerShaman()
+    local localizedClass, englishClass, classIndex = UnitClass("player");
+    return englishClass == "SHAMAN"
 end
 
-function _samyTotemTimers:Init()
-    local mainFrame = CreateFrame("FRAME", ADDON_NAME .. "Frame", UIParent)
-    local buttonRectangle = _config.buttonSize * (_config.buttonSpacingMultiplier  + 1)
-    local totalWidth = buttonRectangle  * 4 - _config.buttonSize * _config.buttonSpacingMultiplier
-    mainFrame:SetWidth(totalWidth)
-    mainFrame:SetHeight(_config.buttonSize)
-
-    local totemLists =  {
-        ["Earth"] = SamyTotemTimerList:New(mainFrame, 0, "Earth"),
-        ["Fire"] = SamyTotemTimerList:New(mainFrame, buttonRectangle, "Fire"),
-        ["Water"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 2, "Water"),
-        ["Air"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 3, "Air"),
-        ["Twist"] = SamyTotemTimerList:New(mainFrame, buttonRectangle * 4, "Twist")
-    }
-
-    mainFrame:SetScript("OnEvent",
-        function (self, event, ...)
-            if (_samyTotemTimers[event]) then
-                local eventArgs = { addon = _samyTotemTimers, frame = self, event = event, totemLists = totemLists, args = ... }
-                _samyTotemTimers[event](nil, eventArgs)
-            end
-        end)
-    
-    mainFrame:SetScript("OnUpdate", 
-        function(self, elapsed) 
-            _samyTotemTimers:OnUpdate({ frame = self, event = "OnUpdate", totemLists = totemLists, args = elapsed }) end)
-
-    mainFrame:RegisterEvent("ADDON_LOADED")
-end
-
-function _samyTotemTimers:ADDON_LOADED(eventArgs)
-    eventArgs.frame:UnregisterEvent("ADDON_LOADED")
-    eventArgs.frame:RegisterEvent("SPELLS_CHANGED")
-    eventArgs.frame:RegisterEvent("LEARNED_SPELL_IN_TAB")
-    eventArgs.frame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
-    eventArgs.frame:RegisterEvent("PLAYER_TOTEM_UPDATE")
-    eventArgs.frame:RegisterEvent("PLAYER_LOGIN")
-    eventArgs.frame:RegisterEvent("PLAYER_ENTER_COMBAT")
-   
-
-    _config:ADDON_LOADED(eventArgs)
-
-    
-    for k, v in pairs(eventArgs.totemLists) do
-        if (v["ADDON_LOADED"]) then
-            v["ADDON_LOADED"]()
-        end
-    end
-
-    DEFAULT_CHAT_FRAME:AddMessage("|cffffff88" .. ADDON_NAME .. "|r loaded.")
-end
-
-function _samyTotemTimers:PLAYER_LOGIN(eventArgs)
-    _samyTotemTimers:LoadSavedVariables(eventArgs.frame, eventArgs.totemLists)
-    _addonLoaded = true
-end
-
-function _samyTotemTimers:LoadSavedVariables(frame, totemLists)
-    frame:ClearAllPoints()
-    frame:SetPoint(_config.db.position.relativePoint, UIParent, _config.db.position.x, _config.db.position.y)
-    frame:SetScale(_config.db.scale)
-
-    for k, v in pairs(totemLists) do
-        if (v["LoadSavedVariables"]) then
-            v["LoadSavedVariables"]()
-        end
-    end
-
-    totemLists["Twist"]:UpdateVisibility(_config.db.isTwist)
-end
-
-function _samyTotemTimers:SPELLS_CHANGED(eventArgs)
-    for k, v in pairs(eventArgs.totemLists) do
-        v:ADDON_LOADED()
-    end
-end
-
-function _samyTotemTimers:LEARNED_SPELL_IN_TAB(eventArgs)
-    for k, v in pairs(eventArgs.totemLists) do
-        v:Refresh()
-    end
-end
-
-function _samyTotemTimers:ACTIONBAR_UPDATE_COOLDOWN(eventArgs)
-    for k, v in pairs(eventArgs.totemLists) do
-        v:UpdateCooldown()
-    end
-end
-
-function _samyTotemTimers:PLAYER_TOTEM_UPDATE(eventArgs)
-    for k, v in pairs(eventArgs.totemLists) do
-        v:UpdateActiveTotem()
-    end
-end
-
-function _samyTotemTimers:PLAYER_ENTER_COMBAT(eventArgs) 
-    for k, v in pairs(eventArgs.totemLists) do
-        v:PLAYER_ENTER_COMBAT()
-    end
-end
-
-function _samyTotemTimers:OnUpdate(eventArgs)
-    _timeSinceLastUpdate = _timeSinceLastUpdate + eventArgs.args
-    if (not _addonLoaded or _timeSinceLastUpdate < UPDATE_RATE) then
+local function RefreshTotemLists(frame, isSelectTotem)
+    if (UnitAffectingCombat("PLAYER")) then
+        _isUpdateTotemLists = true
         return
     end
 
-    _timeSinceLastUpdate = 0
-    for k, v in pairs(eventArgs.totemLists) do
-        v:OnUpdate()
-    end
-end
+    local totalWidth = 0
+    local counter = 1
 
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            totalWidth = totalWidth + SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING
+            frame:SetSize(totalWidth, SamyTotemTimersConfig.BUTTON_SIZE)
 
-_samyTotemTimers:Init()
+            v:SetVisibility(true)
+            v:SetPosition(counter * (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING), 0)
+            v:RefreshTotemSelectList(SamyTotemTimersDb:GetLastUsedTotem(k))
+            if (isSelectTotem) then
+                v:SetSelectedTotem(SamyTotemTimersDb:GetLastUsedTotem(k))
+            end
 
-
-function Temp_SetTimerText(frame, spell, isSpellDuration)
-    if (not frame.timerBackgroundTexture) then
-        frame.timerBackgroundTexture = frame:CreateTexture(nil,"OVERLAY")
-        frame.timerBackgroundTexture:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
-        frame.timerBackgroundTexture:SetPoint("TOPLEFT",1.5,-15)
-        frame.timerBackgroundTexture:SetPoint("BOTTOMRIGHT",1.5,5)
-        frame.timerBackgroundTexture:SetAlpha(0.4)
-    end
-
-    if (not frame.fontString) then
-        frame.fontString = frame:CreateFontString(frame:GetName() .. "TimerText", "OVERLAY", "GameFontHighlight")
-        frame.fontString:SetFont("Fonts\\FRIZQT__.TTF", 15)
-        frame.fontString:SetPoint("CENTER", frame.timerBackgroundTexture, "CENTER")
-    end
-
-   -- print(spell)
-
-    local isShowFrames = false
-    if (not isSpellDuration) then
-        local start, duration, enabled = GetSpellCooldown(spell);
-        if (enabled) then
-            local timeDiff = GetTime() - start
-            local timeLeft = duration - timeDiff
-
-            local d, h, m, s = ChatFrame_TimeBreakDown(timeLeft)
-            frame.fontString:SetFormattedText("%01d:%02d", m, s)
-            isShowFrames = timeLeft > 0
+            counter = counter + 1
+        else
+            v:SetVisibility(false)
         end
     end
+end
 
-    if (isShowFrames and not frame.timerBackgroundTexture:IsVisible()) then
-        frame.timerBackgroundTexture:Show()
-        frame.fontString:Show()
-    elseif (not isShowFrames and frame.timerBackgroundTexture:IsVisible()) then
-        frame.timerBackgroundTexture:Hide()
-        frame.fontString:Hide()
+local function CreateTotemLists(parentFrame)
+    local totemLists = {}
+
+    for k, v in pairs(SamyTotemTimersDb:GetTotemLists()) do
+        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"])
+        totemList:SetEnabled(v["isEnabled"])
+        totemList.selectedSpellChanged = function(self, totemListId, spellName) 
+            SamyTotemTimersDb:SelectedSpellChanged(totemListId, spellName)
+            RefreshTotemLists(parentFrame, false)
+        end
+
+        totemList.positionChanged = function () 
+            SamyTotemTimersDb.PositionChanged()
+            RefreshTotemLists(parentFrame, false)
+        end
+
+        totemLists[k] = totemList
     end
 
-    return isShowFrames
+    return totemLists
 end
+
+function _samyTotemTimers:OnInitialize()
+    if (not IsPlayerShaman()) then
+        SamyTotemTimersUtils:Print("Not loaded. Only works for shamans")
+        return
+    end
+
+    SamyTotemTimersDb:OnInitialize(self)
+
+    self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
+
+    local totemLists, totalWidth = CreateTotemLists(self.frame)
+    _totemLists = totemLists
+
+    SamyTotemTimersDb:RestoreScaleAndPosition()
+    self.frame:Show()
+
+    SamyTotemTimersUtils:Print("Loaded")
+end
+
+function _samyTotemTimers:SetDraggable(isDraggable)
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v:SetDraggable(isDraggable)
+        end
+    end
+end
+
+function _samyTotemTimers:SetListEnabled(listId, isEnabled)
+    _totemLists[listId]:SetEnabled(isEnabled)
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end
+
+_samyTotemTimers:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", function()
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v:UpdateCooldown()
+        end
+    end
+end)
+
+_samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex) 
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v:UpdateActiveTotemInfo(totemIndex)
+        end
+    end
+end)
+
+_samyTotemTimers:RegisterEvent("SPELLS_CHANGED", function()
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end)
+
+_samyTotemTimers:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+    if (not _isUpdateTotemLists) then
+        return
+    end
+
+    _isUpdateTotemLists = false
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end)
