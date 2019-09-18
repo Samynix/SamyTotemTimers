@@ -1,5 +1,9 @@
 SamyTotemTimersUtils = {}
 
+function SamyTotemTimersUtils:Round(number, decimals)
+    return (("%%.%df"):format(decimals)):format(number)
+end
+
 function SamyTotemTimersUtils:Trim(string)
     return string:match'^%s*(.*%S)' or ''
  end
@@ -29,4 +33,24 @@ function SamyTotemTimersUtils:IsSpellsEqual(spellOne, spellTwo)
     end
 
     return spellOne == spellTwo
+end
+
+function SamyTotemTimersUtils:GetUnitBuffs(unit)
+    local buffList = {}
+    for i=1, 40 do
+        local name, _, _, _, _, duration, expirationTime, unitCaster, _, _, spellId = UnitBuff(unit, i)
+        if (name) then
+            table.insert(buffList, 
+                { 
+                    ["name"] = name,
+                    ["duration"] = duration,
+                    ["expirationTime"] = expirationTime,
+                    ["unitCaster"] = unitCaster,
+                    ["spellId"] = spellId
+                }       
+            )
+        end
+    end
+
+    return buffList
 end

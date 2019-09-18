@@ -1,5 +1,7 @@
 SamyTotemTimersConfig = {}
 
+SamyTotemTimersConfig.ONUPDATEDELAY = 0.25
+SamyTotemTimersConfig.PULSESTATUSBARHEIGHT = 15
 SamyTotemTimersConfig.VERTICAL_SPACING = 7
 SamyTotemTimersConfig.HORIZONTAL_SPACING = 10
 SamyTotemTimersConfig.BUTTON_SIZE = 32
@@ -13,37 +15,6 @@ end
 
 SamyTotemTimersConfig.defaultTotemLists = {
     [1] = {
-        ["totems"] = {
-            ["Stoneskin Totem"] = {
-                ["RankOneSpellID"] = 8071,
-                ["ElementID"] = 2
-            },
-    
-            ["Earthbind Totem"] = {
-                ["RankOneSpellID"] = 2484,
-                ["ElementID"] = 2
-            },
-    
-            ["Stoneclaw Totem"] = {
-                ["RankOneSpellID"] = 5730,
-                ["ElementID"] = 2
-            },
-    
-            ["Strength of Earth Totem"] = {
-                ["RankOneSpellID"] = 8075,
-                ["ElementID"] = 2
-            },
-    
-            ["Tremor Totem"] = {
-                ["RankOneSpellID"] = 8143,
-                ["ElementID"] = 2
-            }
-        },
-        ["isEnabled"] = true,
-        ["name"] = "Earth"
-
-    },
-    [2] = {
         ["totems"] = {
             ["Searing Totem"] = {
                 ["RankOneSpellID"] = 3599,
@@ -73,7 +44,81 @@ SamyTotemTimersConfig.defaultTotemLists = {
         ["isEnabled"] = true,
         ["name"] = "Fire"
     },
+    [2] = {
+        ["totems"] = {
+            ["Stoneskin Totem"] = {
+                ["RankOneSpellID"] = 8071,
+                ["ElementID"] = 2
+            },
+    
+            ["Earthbind Totem"] = {
+                ["RankOneSpellID"] = 2484,
+                ["ElementID"] = 2
+            },
+    
+            ["Stoneclaw Totem"] = {
+                ["RankOneSpellID"] = 5730,
+                ["ElementID"] = 2
+            },
+    
+            ["Strength of Earth Totem"] = {
+                ["RankOneSpellID"] = 8075,
+                ["ElementID"] = 2
+            },
+    
+            ["Tremor Totem"] = {
+                ["RankOneSpellID"] = 8143,
+                ["ElementID"] = 2,
+                ["PulseTime"] = 5,
+            }
+        },
+        ["isEnabled"] = true,
+        ["name"] = "Earth"
+
+    },
     [3] = {
+        ["totems"] = {
+            ["Grace of Air Totem"] = {
+                ["RankOneSpellID"] = 8835,
+                ["ElementID"] = 4
+            },
+    
+            ["Nature Resistance Totem"] = {
+                ["RankOneSpellID"] = 10595,
+                ["ElementID"] = 4
+            },
+    
+            ["Windwall Totem"] = {
+                ["RankOneSpellID"] = 15107,
+                ["ElementID"] = 4
+            },
+    
+            ["Windfury Totem"] = {
+                ["RankOneSpellID"] = 8512,
+                ["ElementID"] = 4,
+                ["PulseTime"] = 5,
+            },
+    
+            ["Grounding Totem"] = {
+                ["RankOneSpellID"] = 8177,
+                ["ElementID"] = 4,
+                ["PulseTime"] = 10,
+            },
+    
+            ["Sentry Totem"] = {
+                ["RankOneSpellID"] = 6495,
+                ["ElementID"] = 4
+            },
+    
+            ["Tranquil Air Totem"] = {
+                ["RankOneSpellID"] = 25908,
+                ["ElementID"] = 4
+            }
+        },
+        ["isEnabled"] = true,
+        ["name"] = "Air"
+    },
+    [4] = {
         ["totems"] = {
             ["Healing Stream Totem"] = {
                 ["RankOneSpellID"] = 5394,
@@ -108,80 +153,16 @@ SamyTotemTimersConfig.defaultTotemLists = {
         ["isEnabled"] = true,
         ["name"] = "Water"
     },
-    [4] = {
-        ["totems"] = {
-            ["Grace of Air Totem"] = {
-                ["RankOneSpellID"] = 8835,
-                ["ElementID"] = 4
-            },
-    
-            ["Nature Resistance Totem"] = {
-                ["RankOneSpellID"] = 10595,
-                ["ElementID"] = 4
-            },
-    
-            ["Windwall Totem"] = {
-                ["RankOneSpellID"] = 15107,
-                ["ElementID"] = 4
-            },
-    
-            ["Windfury Totem"] = {
-                ["RankOneSpellID"] = 8512,
-                ["ElementID"] = 4
-            },
-    
-            ["Grounding Totem"] = {
-                ["RankOneSpellID"] = 8177,
-                ["ElementID"] = 4
-            },
-    
-            ["Sentry Totem"] = {
-                ["RankOneSpellID"] = 6495,
-                ["ElementID"] = 4
-            },
-    
-            ["Tranquil Air Totem"] = {
-                ["RankOneSpellID"] = 25908,
-                ["ElementID"] = 4
-            }
-        },
-        ["isEnabled"] = true,
-        ["name"] = "Air"
-    },
     [5] = {
         ["totems"] = {
-            ["Grace of Air Totem"] = {
-                ["RankOneSpellID"] = 8835,
-                ["ElementID"] = 4
-            },
-    
-            ["Nature Resistance Totem"] = {
-                ["RankOneSpellID"] = 10595,
-                ["ElementID"] = 4
-            },
-    
-            ["Windwall Totem"] = {
-                ["RankOneSpellID"] = 15107,
-                ["ElementID"] = 4
-            },
-    
             ["Windfury Totem"] = {
                 ["RankOneSpellID"] = 8512,
-                ["ElementID"] = 4
+                ["ElementID"] = 4,
+                ["PulseTime"] = 5,
+                ["BuffDuration"] = 10,
             },
-    
-            ["Grounding Totem"] = {
-                ["RankOneSpellID"] = 8177,
-                ["ElementID"] = 4
-            },
-    
-            ["Tranquil Air Totem"] = {
-                ["RankOneSpellID"] = 25908,
-                ["ElementID"] = 4
-            }
         },
         ["isEnabled"] = false,
-        ["name"] = "Twist"
+        ["name"] = "Twist",
     },
-
 }

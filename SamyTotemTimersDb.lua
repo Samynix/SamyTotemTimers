@@ -18,7 +18,7 @@ local function EnsureSavedVariablesExists(isReset)
         return ref
     end
 
-    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2)) then
+    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.1)) then
         isReset = true
         SamyTotemTimersUtils:Print("Current version incompatible with old saved variables, reseting all configuration")
     end
@@ -33,7 +33,7 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
     SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, isReset)
-    SamyTotemTimersDB.version = 2
+    SamyTotemTimersDB.version = 2.1
 
     return SamyTotemTimersDB
 end

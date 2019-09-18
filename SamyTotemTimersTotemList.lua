@@ -72,7 +72,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     function instance:SetPosition(posX, posY)
         frame:SetPoint("CENTER", parentFrame, "CENTER", posX, 0)
-        selectListFrame:SetPoint("CENTER", parentFrame, "CENTER", posX, 0 + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
+        selectListFrame:SetPoint("CENTER", parentFrame, "CENTER", posX, SamyTotemTimersConfig.PULSESTATUSBARHEIGHT + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
         castTotemButton:SetPosition(0, 0)
         activeTotemButton:SetPosition(0, SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING)
     end
@@ -135,6 +135,10 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     function instance:UpdateActiveTotemInfo(totemIndexChanged)
         activeTotemButton:UpdateActiveTotemInfo(totemIndexChanged)
+    end
+
+    function instance:UpdateActiveTotemAffectedCount()
+        activeTotemButton:UpdateActiveTotemAffectedCount()
     end
 
     return instance
