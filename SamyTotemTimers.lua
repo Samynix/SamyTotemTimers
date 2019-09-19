@@ -18,16 +18,39 @@ local function RefreshTotemLists(frame, isSelectTotem)
     local totalWidth = 0
     local counter = 1
 
+    local sortedTotemList = {}
     for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v.listId = k
+            table.insert(sortedTotemList, v)
+        else
+            v:SetVisibility(false)
+        end
+    end
+    table.sort(sortedTotemList, function(left, right)
+        local leftValue = 0
+        if (left and left.order) then
+            leftValue = left.order
+        end
+
+        local rightValue = 0
+        if (right and right.order) then
+            rightValue = right.order
+        end
+        
+        return leftValue < rightValue
+    end)
+    
+    for k, v in pairs(sortedTotemList) do
         if (v.isEnabled) then
             totalWidth = totalWidth + SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING
             frame:SetSize(totalWidth, SamyTotemTimersConfig.BUTTON_SIZE)
 
             v:SetVisibility(true)
             v:SetPosition(counter * (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING), 0)
-            v:RefreshTotemSelectList(SamyTotemTimersDb:GetLastUsedTotem(k))
+            v:RefreshTotemSelectList(SamyTotemTimersDb:GetLastUsedTotem(v.listId))
             if (isSelectTotem) then
-                v:SetSelectedTotem(SamyTotemTimersDb:GetLastUsedTotem(k))
+                v:SetSelectedTotem(SamyTotemTimersDb:GetLastUsedTotem(v.listId))
             end
 
             counter = counter + 1
@@ -41,8 +64,9 @@ local function CreateTotemLists(parentFrame)
     local totemLists = {}
 
     for k, v in pairs(SamyTotemTimersDb:GetTotemLists()) do
-        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"])
+        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"])
         totemList:SetEnabled(v["isEnabled"])
+        totemList:SetOrder(v["order"])
         totemList.selectedSpellChanged = function(self, totemListId, spellName) 
             SamyTotemTimersDb:SelectedSpellChanged(totemListId, spellName)
             RefreshTotemLists(parentFrame, false)
@@ -89,6 +113,19 @@ end
 
 function _samyTotemTimers:SetListEnabled(listId, isEnabled)
     _totemLists[listId]:SetEnabled(isEnabled)
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end
+
+function _samyTotemTimers:SetTotemEnabled(listId, totemName, isEnabled)
+    _totemLists[listId]:SetTotemEnabled(totemName, isEnabled)
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end
+
+function _samyTotemTimers:TotemListsOrderChanged(listOfOrdersChanged)
+    for k, v in pairs(listOfOrdersChanged) do
+        _totemLists[k]:SetOrder(v)
+    end
+
     RefreshTotemLists(_samyTotemTimers.frame, true)
 end
 

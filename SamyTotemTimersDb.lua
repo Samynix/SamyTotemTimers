@@ -22,7 +22,22 @@ local function EnsureSavedVariablesExists(isReset)
         isReset = true
         SamyTotemTimersUtils:Print("Current version incompatible with old saved variables, reseting all configuration")
     end
+
+    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.3)) then
+        SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, true)  
+        SamyTotemTimersUtils:Print("Updated twist totem list with more totems, added order to totemlists")
+    end
+
+    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.4)) then
+        SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, false)
+        for k, v in pairs(SamyTotemTimersDB.totemLists) do
+            for k2, v2 in pairs(v.totems) do
+                v2.isEnabled = true
+            end
+        end
         
+        SamyTotemTimersUtils:Print("Added enable/disable to all totems")
+    end
 
     SamyTotemTimersDB = SetDefault(SamyTotemTimersDB, {}, isReset)
     SamyTotemTimersDB.lastUsedTotems = SetDefault(SamyTotemTimersDB.lastUsedTotems, {}, isReset)
@@ -33,7 +48,7 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
     SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, isReset)
-    SamyTotemTimersDB.version = 2.1
+    SamyTotemTimersDB.version = 2.4
 
     return SamyTotemTimersDB
 end
@@ -97,16 +112,49 @@ function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
                     set = function(info, newValue) SamyTotemTimersDb:SetTotemListEnabled(k, newValue) end,
                     get = function() return SamyTotemTimersDb:GetTotemListEnabled(k) end,
                 },
-                keybind = {
+                order = {
                     order = 2,
+                    name = "Order",
+                    min = 1,
+                    max = #SamyTotemTimersDB.totemLists,
+                    softMin = 1,
+                    softMax = #SamyTotemTimersDB.totemLists,
+                    step  = 1,
+                    bigStep = 1,
+                    type = "range",
+                    set = function(info, newValue) SamyTotemTimersDb:SetTotemListOrder(k, newValue) end,
+                    get = function() return SamyTotemTimersDb:GetTotemListOrder(k) end,
+                },
+                keybind = {
+                    order = 3,
                     type = "keybinding",
                     name = "Keybinding",
                     desc = "Keybinding for " .. v.name,
                     set = function (info, newValue) SamyTotemTimersDb:SetKeybinding(k, newValue) end,
                     get = function () return SamyTotemTimersDb:GetKeybinding(k) end,
+                },
+                totems = {
+                    order = 4,
+                    type = "group",
+                    name = "Totems",
+                    desc = "Enable/Disable totems for this list",
+                    args = {
+
+                    }
                 }
             }
         }
+
+        for k2, v2 in pairs(v.totems) do
+            options.args.totems.args[key].args.totems.args[k2] = {
+                order = 1,
+                name = k2,
+                desc = "Enable/Disable " .. k2,
+                type = "toggle",
+                set = function(info, newValue) SamyTotemTimersDb:SetTotemEnabled(k, k2, newValue) end,
+                get = function() return SamyTotemTimersDb:GetTotemEnabled(k, k2) end,
+            }
+        end
     end
 
     local ACD3 = LibStub("AceConfigDialog-3.0")
@@ -152,6 +200,38 @@ end
 
 function SamyTotemTimersDb:GetTotemListEnabled(totemListId)
     return _db.totemLists[totemListId].isEnabled
+end
+
+function SamyTotemTimersDb:SetTotemEnabled(totemListId, totemName, isEnabled)
+    _db.totemLists[totemListId].totems[totemName].isEnabled = isEnabled
+    _samyTotemTimers:SetTotemEnabled(totemListId, totemName, isEnabled)
+end
+
+function SamyTotemTimersDb:GetTotemEnabled(totemListId, totemName, isEnabled)
+    if (_db.totemLists[totemListId].totems[totemName].isEnabled == nil) then
+        _db.totemLists[totemListId].totems[totemName].isEnabled = true
+    end
+
+    return _db.totemLists[totemListId].totems[totemName].isEnabled
+end
+
+function SamyTotemTimersDb:SetTotemListOrder(totemListId, newValue)
+    local ordersChanged = {}
+    local oldOrder = _db.totemLists[totemListId].order
+    for k, v in pairs(_db.totemLists) do
+        if (v.order == newValue) then
+            v.order = oldOrder
+            ordersChanged[k] = v.order
+        end
+    end
+
+    _db.totemLists[totemListId].order = newValue
+    ordersChanged[totemListId] = _db.totemLists[totemListId].order
+    _samyTotemTimers:TotemListsOrderChanged(ordersChanged)
+end
+
+function SamyTotemTimersDb:GetTotemListOrder(totemListId)
+    return _db.totemLists[totemListId].order
 end
 
 function SamyTotemTimersDb:GetKeybinding(totemListId)

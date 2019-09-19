@@ -28,8 +28,8 @@ local function CreateCastTotemButton(totemListInstance, parentFrame, mainFrame, 
     return castTotemButton
 end
 
-local function CreateActiveTotemButton(parentFrame, totemInfoList, totemListId)
-    local activeTotemButton = SamyTotemTimersActiveTotemButton:Create(parentFrame, totemInfoList, totemListId)
+local function CreateActiveTotemButton(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
+    local activeTotemButton = SamyTotemTimersActiveTotemButton:Create(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
     return activeTotemButton
 end
 
@@ -39,13 +39,14 @@ local function CreateTotemSelectButtons(selectListFrame, totemInfoList, castTote
     for k, v in pairs(totemInfoList) do
         local selectTotemButton = SamyTotemTimersSelectTotemButton:Create(selectListFrame, v, castTotemButton)
         selectTotemButton:SetVisibility(false)
-        table.insert(totemSelectList, selectTotemButton)
+        selectTotemButton.isEnabled = v.isEnabled
+        totemSelectList[k] = selectTotemButton
     end
 
     return totemSelectList
 end
 
-function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList)
+function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem)
     local instance = {}
 
     local frame = CreateFrame("Frame", "SamyTotemTimersTotemFrame" .. totemListId, parentFrame)
@@ -53,13 +54,17 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     local selectListFrame = CreateSelectListFrame(frame)
     local castTotemButton = CreateCastTotemButton(instance, frame, parentFrame, totemListId, selectListFrame)
-    local activeTotemButton = CreateActiveTotemButton(frame, totemInfoList, totemListId)
+    local activeTotemButton = CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
     local totemSelectList = CreateTotemSelectButtons(selectListFrame, totemInfoList, castTotemButton)
 
     local lastTotemSelectButton = nil
 
     function instance:SetEnabled(isEnabled)
         instance.isEnabled = isEnabled
+    end
+
+    function instance:SetOrder(order)
+        instance.order = order or 0
     end
 
     function instance:SetVisibility(isVisible)
@@ -87,6 +92,10 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         end
     end
 
+    function instance:SetTotemEnabled(totemName, isEnabled) 
+        totemSelectList[totemName].isEnabled = isEnabled
+    end
+
     function instance:SetSelectedTotem(spellName)
         local totemSelectButton = nil
         for k, v in pairs(totemSelectList) do
@@ -108,7 +117,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         local topOfParent = parentFrame:GetTop()
 
         for k, v in pairs(totemSelectList) do
-            if (SamyTotemTimersUtils:IsSpellsEqual(spellToHide, v.spellName)) then
+            if (SamyTotemTimersUtils:IsSpellsEqual(spellToHide, v.spellName) or not v.isEnabled) then
                 v:SetVisibility(false)
             elseif (v.isAvailable or v:UpdateIsAvailable()) then
                 v:SetVisibility(true)

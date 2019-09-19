@@ -21,7 +21,7 @@ local function CreatePulseStatusBar(parentFrame)
     return statusbar
 end
 
-function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId)
+function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId, castTotemButton, isOnlyShowSelectedTotem)
     local templates = "ActionButtonTemplate"
     local instance = SamyTotemTimersButtonBase:Create(parentFrame, "SamyTotemTimers" .. totemListId .. "ActiveTotemButton", templates)
     instance.pulseStatusBar = CreatePulseStatusBar(instance.frame)
@@ -51,7 +51,7 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
         table.insert(elementTotemDictionary[v["ElementID"]], {
             ["spellName"] = spellName,
             ["pulseTime"] = v["PulseTime"],
-            ["buffDuration"] = v["BuffDuration"]
+            ["buffDuration"] = v["BuffDuration"],
         })
     end
 
@@ -63,7 +63,9 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     
             for k, v in pairs(elementTotemDictionary[totemIndex]) do
                 local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(totemIndex)
-                if (haveTotem and string.match(totemName, v.spellName)) then
+                local isSelectedTotem = SamyTotemTimersUtils:IsSpellsEqual(castTotemButton.spellName, v.spellName)
+
+                if (haveTotem and string.match(totemName, v.spellName) and (not isOnlyShowSelectedTotem or isSelectedTotem)) then
                     instance:SetTexture(v.spellName)
                     instance:SetSpell(v.spellName, totemIndex, true)
                     local timeLeft = duration + startTime - GetTime()
