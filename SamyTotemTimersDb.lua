@@ -1,4 +1,4 @@
-SamyTotemTimersDb = {}
+SamyTotemTimersDatabase = {}
 
 if not SaveBindings then
     function SaveBindings(p)
@@ -8,6 +8,7 @@ end
 
 local _db = nil
 local _samyTotemTimers = nil
+local _isSamyTotemTimersFrameLocked = true
 
 local function EnsureSavedVariablesExists(isReset)
     local function SetDefault(ref, default, isOverride)
@@ -39,6 +40,16 @@ local function EnsureSavedVariablesExists(isReset)
         SamyTotemTimersUtils:Print("Added enable/disable to all totems")
     end
 
+    local function postEnsureVariablesExists()
+        for k, v in pairs(SamyTotemTimersDB.totemLists) do
+            if (v.isShowPulseTimers == nil) then
+                v.isShowPulseTimers = true
+            end
+        end
+
+        SamyTotemTimersDB.version = 2.4
+    end
+
     SamyTotemTimersDB = SetDefault(SamyTotemTimersDB, {}, isReset)
     SamyTotemTimersDB.lastUsedTotems = SetDefault(SamyTotemTimersDB.lastUsedTotems, {}, isReset)
     SamyTotemTimersDB.scale = SetDefault(SamyTotemTimersDB.scale, 1, isReset)
@@ -48,12 +59,14 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
     SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, isReset)
-    SamyTotemTimersDB.version = 2.4
+    
+
+    postEnsureVariablesExists()
 
     return SamyTotemTimersDB
 end
 
-function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
+function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
     _samyTotemTimers = samyTotemTimers
     _db = EnsureSavedVariablesExists()
 
@@ -109,11 +122,19 @@ function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
                     name = "Enabled",
                     desc = "Enable/Disable totem list",
                     type = "toggle",
-                    set = function(info, newValue) SamyTotemTimersDb:SetTotemListEnabled(k, newValue) end,
-                    get = function() return SamyTotemTimersDb:GetTotemListEnabled(k) end,
+                    set = function(info, newValue) SamyTotemTimersDatabase:SetTotemListEnabled(k, newValue) end,
+                    get = function() return SamyTotemTimersDatabase:GetTotemListEnabled(k) end,
+                },
+                isShowPulseTimers = {
+                    order = 2,
+                    name = "Show pulse",
+                    desc = "Show pulse timers for supported totems?",
+                    type = "toggle",
+                    set = function(info, newValue) SamyTotemTimersDatabase:SetIsShowPulse(k, newValue) end,
+                    get = function() return SamyTotemTimersDatabase:GetIsShowPulse(k) end
                 },
                 order = {
-                    order = 2,
+                    order = 3,
                     name = "Order",
                     min = 1,
                     max = #SamyTotemTimersDB.totemLists,
@@ -122,19 +143,19 @@ function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
                     step  = 1,
                     bigStep = 1,
                     type = "range",
-                    set = function(info, newValue) SamyTotemTimersDb:SetTotemListOrder(k, newValue) end,
-                    get = function() return SamyTotemTimersDb:GetTotemListOrder(k) end,
+                    set = function(info, newValue) SamyTotemTimersDatabase:SetTotemListOrder(k, newValue) end,
+                    get = function() return SamyTotemTimersDatabase:GetTotemListOrder(k) end,
                 },
                 keybind = {
-                    order = 3,
+                    order = 4,
                     type = "keybinding",
                     name = "Keybinding",
                     desc = "Keybinding for " .. v.name,
-                    set = function (info, newValue) SamyTotemTimersDb:SetKeybinding(k, newValue) end,
-                    get = function () return SamyTotemTimersDb:GetKeybinding(k) end,
+                    set = function (info, newValue) SamyTotemTimersDatabase:SetKeybinding(k, newValue) end,
+                    get = function () return SamyTotemTimersDatabase:GetKeybinding(k) end,
                 },
                 totems = {
-                    order = 4,
+                    order = 5,
                     type = "group",
                     name = "Totems",
                     desc = "Enable/Disable totems for this list",
@@ -151,8 +172,8 @@ function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
                 name = k2,
                 desc = "Enable/Disable " .. k2,
                 type = "toggle",
-                set = function(info, newValue) SamyTotemTimersDb:SetTotemEnabled(k, k2, newValue) end,
-                get = function() return SamyTotemTimersDb:GetTotemEnabled(k, k2) end,
+                set = function(info, newValue) SamyTotemTimersDatabase:SetTotemEnabled(k, k2, newValue) end,
+                get = function() return SamyTotemTimersDatabase:GetTotemEnabled(k, k2) end,
             }
         end
     end
@@ -162,12 +183,12 @@ function SamyTotemTimersDb:OnInitialize(samyTotemTimers)
     local optFrame = ACD3:AddToBlizOptions("SamyTotemTimers", "SamyTotemTimers")
 end
 
-function SamyTotemTimersDb:SelectedSpellChanged(listName, spellName)
+function SamyTotemTimersDatabase:SelectedSpellChanged(listName, spellName)
     SamyTotemTimersUtils:Debug("Totem changed for " .. listName .. ": " .. tostring(spellName))
     _db.lastUsedTotems[listName] = spellName
 end
 
-function SamyTotemTimersDb:PositionChanged()
+function SamyTotemTimersDatabase:PositionChanged()
     local point, relativeTo, relativePoint, x, y = _samyTotemTimers.frame:GetPoint()
     _db.position.x = x
     _db.position.y = y
@@ -175,7 +196,7 @@ function SamyTotemTimersDb:PositionChanged()
     _db.position.hasChanged = true
 end
 
-function SamyTotemTimersDb:RestoreScaleAndPosition()
+function SamyTotemTimersDatabase:RestoreScaleAndPosition()
     if (_db.position.hasChanged) then
         _samyTotemTimers.frame:SetPoint(_db.position.relativePoint, UIParent, _db.position.x, _db.position.y)
     else
@@ -185,29 +206,40 @@ function SamyTotemTimersDb:RestoreScaleAndPosition()
     _samyTotemTimers.frame:SetScale(_db.scale)
 end
 
-function SamyTotemTimersDb:GetLastUsedTotem(totemListId)
+function SamyTotemTimersDatabase:GetLastUsedTotem(totemListId)
     return _db.lastUsedTotems[totemListId]
 end
 
-function SamyTotemTimersDb:GetTotemLists()
+function SamyTotemTimersDatabase:GetTotemLists()
     return _db.totemLists
 end
 
-function SamyTotemTimersDb:SetTotemListEnabled(totemListId, isEnabled)
+function SamyTotemTimersDatabase:SetTotemListEnabled(totemListId, isEnabled)
     _db.totemLists[totemListId].isEnabled = isEnabled
     _samyTotemTimers:SetListEnabled(totemListId, isEnabled)
 end
 
-function SamyTotemTimersDb:GetTotemListEnabled(totemListId)
+function SamyTotemTimersDatabase:GetTotemListEnabled(totemListId)
     return _db.totemLists[totemListId].isEnabled
 end
 
-function SamyTotemTimersDb:SetTotemEnabled(totemListId, totemName, isEnabled)
+
+function SamyTotemTimersDatabase:SetIsShowPulse(totemListId, isShowPulseTimers)
+    _db.totemLists[totemListId].isShowPulseTimers = isShowPulseTimers
+    _samyTotemTimers:SetIsShowPulse(totemListId, isShowPulseTimers)
+end
+
+function SamyTotemTimersDatabase:GetIsShowPulse(totemListId)
+    return _db.totemLists[totemListId].isShowPulseTimers
+end
+
+
+function SamyTotemTimersDatabase:SetTotemEnabled(totemListId, totemName, isEnabled)
     _db.totemLists[totemListId].totems[totemName].isEnabled = isEnabled
     _samyTotemTimers:SetTotemEnabled(totemListId, totemName, isEnabled)
 end
 
-function SamyTotemTimersDb:GetTotemEnabled(totemListId, totemName, isEnabled)
+function SamyTotemTimersDatabase:GetTotemEnabled(totemListId, totemName, isEnabled)
     if (_db.totemLists[totemListId].totems[totemName].isEnabled == nil) then
         _db.totemLists[totemListId].totems[totemName].isEnabled = true
     end
@@ -215,7 +247,7 @@ function SamyTotemTimersDb:GetTotemEnabled(totemListId, totemName, isEnabled)
     return _db.totemLists[totemListId].totems[totemName].isEnabled
 end
 
-function SamyTotemTimersDb:SetTotemListOrder(totemListId, newValue)
+function SamyTotemTimersDatabase:SetTotemListOrder(totemListId, newValue)
     local ordersChanged = {}
     local oldOrder = _db.totemLists[totemListId].order
     for k, v in pairs(_db.totemLists) do
@@ -230,16 +262,16 @@ function SamyTotemTimersDb:SetTotemListOrder(totemListId, newValue)
     _samyTotemTimers:TotemListsOrderChanged(ordersChanged)
 end
 
-function SamyTotemTimersDb:GetTotemListOrder(totemListId)
+function SamyTotemTimersDatabase:GetTotemListOrder(totemListId)
     return _db.totemLists[totemListId].order
 end
 
-function SamyTotemTimersDb:GetKeybinding(totemListId)
+function SamyTotemTimersDatabase:GetKeybinding(totemListId)
     local bindingName = format('CLICK %s:%s', SamyTotemTimersConfig:GetCastTotemButtonName(totemListId), GetCurrentBindingSet())
     return GetBindingKey(bindingName)
 end
 
-function SamyTotemTimersDb:SetKeybinding(totemListId, newValue)
+function SamyTotemTimersDatabase:SetKeybinding(totemListId, newValue)
     local currentBindingInfo = self:GetKeybinding(totemListId)
     if (currentBindingInfo) then
         SetBinding(currentBindingInfo, nil)
@@ -249,26 +281,26 @@ function SamyTotemTimersDb:SetKeybinding(totemListId, newValue)
     SaveBindings(GetCurrentBindingSet())
 end
 
-function SamyTotemTimersDb:SetScale(info, newValue)
+function SamyTotemTimersDatabase:SetScale(info, newValue)
     _db.scale = newValue
     _samyTotemTimers.frame:SetScale(newValue)
 end
 
-function SamyTotemTimersDb:GetScale(info) 
+function SamyTotemTimersDatabase:GetScale(info) 
     return _db.scale
 end
 
-function SamyTotemTimersDb:ToggleLock()
-    _isLocked = not _isLocked
-    _samyTotemTimers:SetDraggable(_isLocked)
-    if (_isLocked) then
+function SamyTotemTimersDatabase:ToggleLock()
+    _isSamyTotemTimersFrameLocked = not _isSamyTotemTimersFrameLocked
+    _samyTotemTimers:SetDraggable(not _isSamyTotemTimersFrameLocked)
+    if (_isSamyTotemTimersFrameLocked) then
         SamyTotemTimersUtils:Print("Frame locked")
     else
         SamyTotemTimersUtils:Print("Frame unlocked")
     end
 end
 
-function SamyTotemTimersDb:ResetConfig()
+function SamyTotemTimersDatabase:ResetConfig()
     EnsureSavedVariablesExists(true)
     ReloadUI()
 end

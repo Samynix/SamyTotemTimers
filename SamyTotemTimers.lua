@@ -1,5 +1,9 @@
 local _samyTotemTimers = LibStub("AceAddon-3.0"):NewAddon("SamyTotemTimers", "AceEvent-3.0")
 
+local _libCallback = LibStub("CallbackHandler-1.0"):New(_samyTotemTimers)
+
+
+
 local _totemLists = {}
 local _isUpdateTotemLists = false
 local _timeSinceLastUpdate = 0
@@ -47,10 +51,11 @@ local function RefreshTotemLists(frame, isSelectTotem)
             frame:SetSize(totalWidth, SamyTotemTimersConfig.BUTTON_SIZE)
 
             v:SetVisibility(true)
+            v:RefreshTotemSelectList(SamyTotemTimersDatabase:GetLastUsedTotem(v.listId))
             v:SetPosition(counter * (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING), 0)
-            v:RefreshTotemSelectList(SamyTotemTimersDb:GetLastUsedTotem(v.listId))
+            
             if (isSelectTotem) then
-                v:SetSelectedTotem(SamyTotemTimersDb:GetLastUsedTotem(v.listId))
+                v:SetSelectedTotem(SamyTotemTimersDatabase:GetLastUsedTotem(v.listId))
             end
 
             counter = counter + 1
@@ -63,17 +68,19 @@ end
 local function CreateTotemLists(parentFrame)
     local totemLists = {}
 
-    for k, v in pairs(SamyTotemTimersDb:GetTotemLists()) do
+    for k, v in pairs(SamyTotemTimersDatabase:GetTotemLists()) do
         local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"])
         totemList:SetEnabled(v["isEnabled"])
         totemList:SetOrder(v["order"])
-        totemList.selectedSpellChanged = function(self, totemListId, spellName) 
-            SamyTotemTimersDb:SelectedSpellChanged(totemListId, spellName)
+        totemList:SetIsShowPulse(v.isShowPulseTimers)
+        totemList.selectedSpellChanged = function(self, button, totemListId, spellName) 
+            SamyTotemTimersDatabase:SelectedSpellChanged(totemListId, spellName)
             RefreshTotemLists(parentFrame, false)
+            _libCallback:Fire("OnButtonContentsChanged", button:GetName(), 0, "action", spellName)
         end
 
         totemList.positionChanged = function () 
-            SamyTotemTimersDb.PositionChanged()
+            SamyTotemTimersDatabase.PositionChanged()
             RefreshTotemLists(parentFrame, false)
         end
 
@@ -89,7 +96,11 @@ function _samyTotemTimers:OnInitialize()
         return
     end
 
-    SamyTotemTimersDb:OnInitialize(self)
+    _samyTotemTimers:RegisterCallback("OnButtonContentsChanged", function (a, b, c, d, e)
+        --print(a, b, c, d, e)
+    end)
+
+    SamyTotemTimersDatabase:OnInitialize(self)
 
     self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
     self.frame:SetScript("OnUpdate", self.OnUpdate) 
@@ -97,7 +108,7 @@ function _samyTotemTimers:OnInitialize()
     local totemLists, totalWidth = CreateTotemLists(self.frame)
     _totemLists = totemLists
 
-    SamyTotemTimersDb:RestoreScaleAndPosition()
+    SamyTotemTimersDatabase:RestoreScaleAndPosition()
     self.frame:Show()
 
     SamyTotemTimersUtils:Print("Loaded")
@@ -113,6 +124,11 @@ end
 
 function _samyTotemTimers:SetListEnabled(listId, isEnabled)
     _totemLists[listId]:SetEnabled(isEnabled)
+    RefreshTotemLists(_samyTotemTimers.frame, true)
+end
+
+function _samyTotemTimers:SetIsShowPulse(listId, isShowPulse)
+    _totemLists[listId]:SetIsShowPulse(isShowPulse)
     RefreshTotemLists(_samyTotemTimers.frame, true)
 end
 
@@ -168,4 +184,8 @@ _samyTotemTimers:RegisterEvent("PLAYER_REGEN_ENABLED", function()
 
     _isUpdateTotemLists = false
     RefreshTotemLists(_samyTotemTimers.frame, true)
+end)
+
+_samyTotemTimers:RegisterEvent("ACTIONBAR_SLOT_CHANGED", function(a, b, c, d)
+    --print(a, b, c, d)
 end)

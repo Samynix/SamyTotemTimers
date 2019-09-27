@@ -4,6 +4,7 @@ function SamyTotemTimersSelectTotemButton:Create(parentFrame, totemInfo, castTot
     local spellName = GetSpellInfo(totemInfo["RankOneSpellID"]) or ''
     local templates = "ActionButtonTemplate, SecureActionButtonTemplate, SecureHandlerMouseUpDownTemplate"
     local instance = SamyTotemTimersButtonBase:Create(parentFrame, "SamyTotemTimers" .. spellName .. "SelectTotemButton", templates)
+    instance.pulseTime = totemInfo["PulseTime"]
 
     instance.frame:SetFrameRef("selectListFrame", parentFrame)
     instance.frame:SetFrameRef("castTotemButton", castTotemButton.frame)

@@ -37,7 +37,7 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
         if attribType=="spell" then
             instance:SetTexture(attribDetail)
             if (instance.selectedSpellChanged) then
-                instance:selectedSpellChanged(attribDetail)
+                instance:selectedSpellChanged(self, attribDetail)
             end
         end
     end)

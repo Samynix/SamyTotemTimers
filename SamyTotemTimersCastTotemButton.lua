@@ -3,6 +3,7 @@ SamyTotemTimersCastTotemButton = {}
 function SamyTotemTimersCastTotemButton:Create(parentFrame, mainFrame, totemListId, selectListFrame)
     local templates = "ActionButtonTemplate, SecureActionButtonTemplate, SecureHandlerMouseUpDownTemplate"
     local instance = SamyTotemTimersButtonBase:Create(parentFrame, SamyTotemTimersConfig:GetCastTotemButtonName(totemListId), templates)
+    local originalFrameStrata = nil
 
     instance.frame:SetFrameRef("selectListFrame", selectListFrame)
     instance.frame:SetAttribute("_onmousedown", [[ -- (self, button)
@@ -17,6 +18,19 @@ function SamyTotemTimersCastTotemButton:Create(parentFrame, mainFrame, totemList
             --selectFrame:Hide() Taint maybe
         end
     ]])
+
+    function instance:SetDraggable(isDraggable)
+        if (isDraggable) then
+            originalFrameStrata = instance.frame:GetFrameStrata()
+            instance.frame:RegisterForDrag('LeftButton')
+            ActionButton_ShowOverlayGlow(instance.frame)
+            instance.frame:SetFrameStrata("TOOLTIP")
+        else
+            instance.frame:RegisterForDrag(nil)
+            ActionButton_HideOverlayGlow(instance.frame)
+            instance.frame:SetFrameStrata(originalFrameStrata)
+        end
+    end
 
     instance.frame:SetScript("OnDragStart", function (self)
         mainFrame:SetMovable(true)

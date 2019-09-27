@@ -41,6 +41,10 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
 
     function instance:SetVisibility(isVisible) end --override
 
+    function instance:SetIsShowPulse(isShowPulse)
+        instance.isShowPulse = isShowPulse
+    end
+
     local elementTotemDictionary = {}
     for k, v in pairs(availableTotems) do
         if (not elementTotemDictionary[v["ElementID"]]) then
@@ -70,7 +74,7 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
                     instance:SetSpell(v.spellName, totemIndex, true)
                     local timeLeft = duration + startTime - GetTime()
                     if (timeLeft > 0) then
-                        if (v.pulseTime) then
+                        if (v.pulseTime and instance.isShowPulse) then
                             local pulseTime = v.pulseTime - timeLeft % v.pulseTime
                             instance.pulseStatusBar:SetMinMaxValues(0, v.pulseTime)
                             instance.pulseStatusBar:SetValue(pulseTime)

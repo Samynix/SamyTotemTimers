@@ -11,9 +11,9 @@ end
 
 local function CreateCastTotemButton(totemListInstance, parentFrame, mainFrame, totemListId, selectListFrame)
     local castTotemButton = SamyTotemTimersCastTotemButton:Create(parentFrame, mainFrame, totemListId, selectListFrame)
-    castTotemButton.selectedSpellChanged = function(self, spellName)
+    castTotemButton.selectedSpellChanged = function(self, button, spellName)
         if (totemListInstance.selectedSpellChanged) then
-            totemListInstance:selectedSpellChanged(totemListId, spellName)
+            totemListInstance:selectedSpellChanged(button, totemListId, spellName)
         end
     end
 
@@ -46,7 +46,7 @@ local function CreateTotemSelectButtons(selectListFrame, totemInfoList, castTote
     return totemSelectList
 end
 
-function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem)
+function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem, isShowPulse)
     local instance = {}
 
     local frame = CreateFrame("Frame", "SamyTotemTimersTotemFrame" .. totemListId, parentFrame)
@@ -54,7 +54,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     local selectListFrame = CreateSelectListFrame(frame)
     local castTotemButton = CreateCastTotemButton(instance, frame, parentFrame, totemListId, selectListFrame)
-    local activeTotemButton = CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
+    local activeTotemButton = CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, isShowPulse)
     local totemSelectList = CreateTotemSelectButtons(selectListFrame, totemInfoList, castTotemButton)
 
     local lastTotemSelectButton = nil
@@ -77,23 +77,28 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     function instance:SetPosition(posX, posY)
         frame:SetPoint("CENTER", parentFrame, "CENTER", posX, 0)
-        selectListFrame:SetPoint("CENTER", parentFrame, "CENTER", posX, SamyTotemTimersConfig.PULSESTATUSBARHEIGHT + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
+
+        local selectListExtraHeight = SamyTotemTimersConfig.PULSESTATUSBARHEIGHT
+        if (not instance.hasPulseTotems or not instance.isShowPulse) then
+            selectListExtraHeight = 0
+        end
+
+        selectListFrame:SetPoint("CENTER", parentFrame, "CENTER", posX,  selectListExtraHeight + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
         castTotemButton:SetPosition(0, 0)
         activeTotemButton:SetPosition(0, SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING)
     end
 
     function instance:SetDraggable(isDraggable)
-        if (isDraggable) then
-            castTotemButton.frame:RegisterForDrag('LeftButton')
-            ActionButton_ShowOverlayGlow(castTotemButton.frame)
-        else
-            castTotemButton.frame:RegisterForDrag(nil)
-            ActionButton_HideOverlayGlow(castTotemButton.frame)
-        end
+        castTotemButton:SetDraggable(isDraggable)
     end
 
     function instance:SetTotemEnabled(totemName, isEnabled) 
         totemSelectList[totemName].isEnabled = isEnabled
+    end
+
+    function instance:SetIsShowPulse(isShowPulse)
+        instance.isShowPulse = isShowPulse
+        activeTotemButton:SetIsShowPulse(isShowPulse)
     end
 
     function instance:SetSelectedTotem(spellName)
@@ -122,6 +127,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
             elseif (v.isAvailable or v:UpdateIsAvailable()) then
                 v:SetVisibility(true)
                 v:SetPosition(0, posY)
+                instance.hasPulseTotems = instance.hasPulseTotems or v.pulseTime ~= nil 
                 
                 local checkY = topOfParent + posY + (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING) * 3
                 if (checkY >= topOfScreen) then
