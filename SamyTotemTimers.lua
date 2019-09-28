@@ -7,6 +7,7 @@ local _libCallback = LibStub("CallbackHandler-1.0"):New(_samyTotemTimers)
 local _totemLists = {}
 local _isUpdateTotemLists = false
 local _timeSinceLastUpdate = 0
+local _castChangedTime = nil
 
 local function IsPlayerShaman()
     local localizedClass, englishClass, classIndex = UnitClass("player");
@@ -70,7 +71,7 @@ local function CreateTotemLists(parentFrame)
     local totemLists = {}
 
     for k, v in pairs(SamyTotemTimersDatabase:GetTotemLists()) do
-        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"])
+        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"], v["isShowBuffDuration"])
         totemList:SetEnabled(v["isEnabled"])
         totemList:SetOrder(v["order"])
         totemList:SetIsShowPulse(v.isShowPulseTimers)
@@ -184,10 +185,22 @@ _samyTotemTimers:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", function()
     end
 end)
 
-_samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex) 
+local function MeasureLatency()
+    local delay = 0
+    if (_castChangedTime) then
+        delay = GetTime() - _castChangedTime
+        _castChangedTime = nil
+    end
+
+    return delay
+end
+
+_samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex)
+    local latency = MeasureLatency()
+
     for k, v in pairs(_totemLists) do
         if (v.isEnabled) then
-            v:UpdateActiveTotemInfo(totemIndex)
+            v:UpdateActiveTotemInfo(totemIndex, latency)
         end
     end
 end)
@@ -205,6 +218,9 @@ _samyTotemTimers:RegisterEvent("PLAYER_REGEN_ENABLED", function()
     RefreshTotemLists(_samyTotemTimers.frame, true)
 end)
 
-_samyTotemTimers:RegisterEvent("ACTIONBAR_SLOT_CHANGED", function(a, b, c, d)
-    --print(a, b, c, d)
+_samyTotemTimers:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", function(event) 
+    _castChangedTime = GetTime()
 end)
+
+
+

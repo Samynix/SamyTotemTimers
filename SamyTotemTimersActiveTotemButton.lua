@@ -35,7 +35,6 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     instance.frame:Show()
 
     instance.affectedFontString = instance.frame:CreateFontString(instance.frame:GetName() .. "AffectedText", "OVERLAY", "NumberFontNormal")
-    --instance.affectedFontString:SetFont("Fonts\\FRIZQT__.TTF", 14)
     instance.affectedFontString:SetPoint("TOP", instance.frame, "TOP", 0, -2)
     instance.affectedFontString:Hide()
 
@@ -56,52 +55,66 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             ["spellName"] = spellName,
             ["pulseTime"] = v["PulseTime"],
             ["buffDuration"] = v["BuffDuration"],
+            ["elementId"] = v["ElementID"]
         })
     end
 
-    function instance:UpdateActiveTotemInfo(totemIndexChanged)
-        local function SetTimerText(totemIndex)
-            if (not elementTotemDictionary[totemIndex]) then
-                return
-            end
-    
-            for k, v in pairs(elementTotemDictionary[totemIndex]) do
-                local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(totemIndex)
-                local isSelectedTotem = SamyTotemTimersUtils:IsSpellsEqual(castTotemButton.spellName, v.spellName)
-
-                if (haveTotem and string.match(totemName, v.spellName) and (not isOnlyShowSelectedTotem or isSelectedTotem)) then
-                    instance:SetTexture(v.spellName)
-                    instance:SetSpell(v.spellName, totemIndex, true)
-                    local timeLeft = duration + startTime - GetTime()
-                    if (timeLeft > 0) then
-                        if (v.pulseTime and instance.isShowPulse) then
-                            local pulseTime = v.pulseTime - timeLeft % v.pulseTime
-                            instance.pulseStatusBar:SetMinMaxValues(0, v.pulseTime)
-                            instance.pulseStatusBar:SetValue(pulseTime)
-                            instance.pulseStatusBar.value:SetText(SamyTotemTimersUtils:Round(pulseTime, 1))
-                            instance.pulseStatusBar:Show()
-                        else
-                            instance.pulseStatusBar:Hide()
-                        end
-
-                        local d, h, m, s = ChatFrame_TimeBreakDown(timeLeft)
-                        instance.frame.Count:SetFormattedText("%01d:%02d", m, s)
-                        
-                        if (not instance.frame:IsVisible()) then
-                            instance.frame:Show()
-                        end
-        
-                        C_Timer.NewTimer(0.05, function() SetTimerText(totemIndex) end)
-                        return
-                    end
-                end
-            end
-
+    local function DoWork()
+        if (not instance.hasTotem) then
             instance:SetSpell(nil, nil)
             instance.frame:Hide()
+
+            C_Timer.NewTimer(0.1, function() DoWork() end)
+            return
         end
 
-        SetTimerText(totemIndexChanged)
+        local timeLeft = instance.duration + instance.startTime - GetTime()
+
+        instance:SetTexture(instance.activeTotem.spellName)
+        instance:SetSpell(instance.activeTotem.spellName, instance.activeTotem.elementId, true)
+
+        if (instance.activeTotem.pulseTime and instance.isShowPulse) then
+            local pulseTime = instance.activeTotem.pulseTime - timeLeft % instance.activeTotem.pulseTime
+            instance.pulseStatusBar:SetMinMaxValues(0, instance.activeTotem.pulseTime)
+            instance.pulseStatusBar:SetValue(pulseTime)
+            instance.pulseStatusBar.value:SetText(SamyTotemTimersUtils:Round(pulseTime, 1))
+            instance.pulseStatusBar:Show()
+        else
+            instance.pulseStatusBar:Hide()
+        end
+
+        local d, h, m, s = ChatFrame_TimeBreakDown(timeLeft)
+        instance.frame.Count:SetFormattedText("%01d:%02d", m, s)
+        
+        if (not instance.frame:IsVisible()) then
+            instance.frame:Show()
+        end
+
+        C_Timer.NewTimer(0.1, function() DoWork() end)
+    end
+
+    DoWork()
+
+    function instance:UpdateActiveTotemInfo(totemIndexChanged, latency)
+        if (not elementTotemDictionary[totemIndexChanged]) then
+            return
+        end
+
+        for k, v in pairs(elementTotemDictionary[totemIndexChanged]) do
+            local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(totemIndexChanged)
+            local isSelectedTotem = SamyTotemTimersUtils:IsSpellsEqual(castTotemButton.spellName, v.spellName)
+    
+            if (haveTotem and string.match(totemName, v.spellName) and (not isOnlyShowSelectedTotem or isSelectedTotem)) then
+                instance.activeTotem = v
+                instance.hasTotem = true
+                instance.startTime = startTime + latency
+                instance.duration = duration
+                return                
+            end
+        end
+
+        instance.activeTotem = nil
+        instance.hasTotem = false
     end
 
     function instance:UpdateActiveTotemAffectedCount()

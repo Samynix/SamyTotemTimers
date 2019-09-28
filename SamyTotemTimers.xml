@@ -7,6 +7,7 @@
     <Script file="SamyTotemTimersSelectTotemButton.lua"/>
 	<Script file="SamyTotemTimersCastTotemButton.lua"/>
     <Script file="SamyTotemTimersActiveTotemButton.lua"/>
+    <Script file="SamyTotemTimersBuffTotemButton.lua"/>
     <Script file="SamyTotemTimersTotemList.lua"/>
     <Script file="SamyTotemTimers.lua"/>
 </Ui>

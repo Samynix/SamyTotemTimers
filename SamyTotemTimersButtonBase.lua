@@ -77,8 +77,6 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
         end
     end
 
-    
-
     return instance
 
 end

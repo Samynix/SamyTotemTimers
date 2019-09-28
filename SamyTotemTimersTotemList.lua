@@ -40,7 +40,7 @@ local function CreateTotemSelectButtons(selectListFrame, totemInfoList, castTote
     return totemSelectList
 end
 
-function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem, isShowPulse)
+function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem, isShowBuffDuration)
     local instance = {}
 
     local frame = CreateFrame("Frame", "SamyTotemTimersTotemFrame" .. totemListId, parentFrame)
@@ -48,7 +48,14 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
     local selectListFrame = CreateSelectListFrame(frame)
     local castTotemButton = CreateCastTotemButton(instance, frame, parentFrame, totemListId, selectListFrame)
-    local activeTotemButton = CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, isShowPulse)
+    local activeTotemButton = nil
+
+    if (isShowBuffDuration) then
+        activeTotemButton = SamyTotemTimersBuffTotemButton:Create(frame, SamyTotemTimersUtils:FirstOrDefault(totemInfoList), totemListId)
+    else
+        activeTotemButton =  CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, isShowPulse)
+    end
+
     local totemSelectList = CreateTotemSelectButtons(selectListFrame, totemInfoList, castTotemButton)
 
     local lastTotemSelectButton = nil
@@ -138,8 +145,8 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         castTotemButton:UpdateCooldown()
     end
 
-    function instance:UpdateActiveTotemInfo(totemIndexChanged)
-        activeTotemButton:UpdateActiveTotemInfo(totemIndexChanged)
+    function instance:UpdateActiveTotemInfo(totemIndexChanged, delay)
+        activeTotemButton:UpdateActiveTotemInfo(totemIndexChanged, delay)
     end
 
     function instance:UpdateActiveTotemAffectedCount()

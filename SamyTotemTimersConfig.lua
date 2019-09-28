@@ -208,9 +208,10 @@ SamyTotemTimersConfig.defaultTotemLists = {
             ["Tremor Totem"] = {
                 ["RankOneSpellID"] = 8143,
                 ["ElementID"] = 2,
-                ["PulseTime"] = 5,
+                ["PulseTime"] = 4,
                 ["isEnabled"] = true,
             },
+
             ["Searing Totem"] = {
                 ["RankOneSpellID"] = 3599,
                 ["ElementID"] = 1,
@@ -343,125 +344,4 @@ SamyTotemTimersConfig.defaultTotemLists = {
         ["name"] = "Twist",
         ["order"] = 6,
     },
-}
-
-SamyTotemTimersConfig.allTotems = {
-    ["Stoneskin Totem"] = {
-        ["RankOneSpellID"] = 8071,
-        ["ElementID"] = 2
-    },
-
-    ["Earthbind Totem"] = {
-        ["RankOneSpellID"] = 2484,
-        ["ElementID"] = 2
-    },
-
-    ["Stoneclaw Totem"] = {
-        ["RankOneSpellID"] = 5730,
-        ["ElementID"] = 2
-    },
-
-    ["Strength of Earth Totem"] = {
-        ["RankOneSpellID"] = 8075,
-        ["ElementID"] = 2
-    },
-
-    ["Tremor Totem"] = {
-        ["RankOneSpellID"] = 8143,
-        ["ElementID"] = 2,
-        ["PulseTime"] = 5,
-    },
-    ["Searing Totem"] = {
-        ["RankOneSpellID"] = 3599,
-        ["ElementID"] = 1
-    },
-
-    ["Fire Nova Totem"] = {
-        ["RankOneSpellID"] = 1535,
-        ["ElementID"] = 1
-    },
-
-    ["Frost Resistance Totem"] = {
-        ["RankOneSpellID"] = 8181,
-        ["ElementID"] = 1
-    },
-
-    ["Magma Totem"] = {
-        ["RankOneSpellID"] = 8190,
-        ["ElementID"] = 1
-    },
-
-    ["Flametongue Totem"] = {
-        ["RankOneSpellID"] = 8227,
-        ["ElementID"] = 1
-    },
-
-
-    ["Healing Stream Totem"] = {
-        ["RankOneSpellID"] = 5394,
-        ["ElementID"] = 3
-    },
-
-    ["Mana Spring Totem"] = {
-        ["RankOneSpellID"] = 5675,
-        ["ElementID"] = 3
-    },
-
-    ["Fire Resistance Totem"] = {
-        ["RankOneSpellID"] = 8184,
-        ["ElementID"] = 3
-    },
-
-    ["Mana Tide Totem"] = {
-        ["RankOneSpellID"] = 16190,
-        ["ElementID"] = 3
-    },
-
-    ["Disease Cleansing Totem"] = {
-        ["RankOneSpellID"] = 8170,
-        ["ElementID"] = 3
-    },
-
-    ["Poison Cleansing Totem"] = {
-        ["RankOneSpellID"] = 8166,
-        ["ElementID"] = 3
-    },
-
-    ["Grace of Air Totem"] = {
-        ["RankOneSpellID"] = 8835,
-        ["ElementID"] = 4
-    },
-
-    ["Nature Resistance Totem"] = {
-        ["RankOneSpellID"] = 10595,
-        ["ElementID"] = 4
-    },
-
-    ["Windwall Totem"] = {
-        ["RankOneSpellID"] = 15107,
-        ["ElementID"] = 4
-    },
-
-    ["Windfury Totem"] = {
-        ["RankOneSpellID"] = 8512,
-        ["ElementID"] = 4,
-        ["PulseTime"] = 5,
-        ["BuffDuration"] = 10,
-    },
-
-    ["Grounding Totem"] = {
-        ["RankOneSpellID"] = 8177,
-        ["ElementID"] = 4,
-        ["PulseTime"] = 10,
-    },
-
-    ["Sentry Totem"] = {
-        ["RankOneSpellID"] = 6495,
-        ["ElementID"] = 4
-    },
-
-    ["Tranquil Air Totem"] = {
-        ["RankOneSpellID"] = 25908,
-        ["ElementID"] = 4
-    }
 }

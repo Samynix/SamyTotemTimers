@@ -1,5 +1,15 @@
 SamyTotemTimersUtils = {}
 
+function SamyTotemTimersUtils:FirstOrDefault(list, predicate)
+    for k, v in pairs(list) do
+        if (not predicate or predicate(v)) then
+            return v
+        end
+    end
+
+    return nil
+end
+
 function SamyTotemTimersUtils:Round(number, decimals)
     return (("%%.%df"):format(decimals)):format(number)
 end
