@@ -36,19 +36,34 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
     instance.frame:SetScript("OnAttributeChanged",function(self, attribType, attribDetail)
         if attribType=="spell" then
             instance:SetTexture(attribDetail)
-            if (instance.selectedSpellChanged) then
+            if (instance.selectedSpellChanged and not instance.disableSpellChanged ) then
                 instance:selectedSpellChanged(self, attribDetail)
             end
+
+            instance.disableSpellChanged  = false
         end
     end)
 
     function instance:SetTexture(spellName)
         if (not SamyTotemTimersUtils:StringIsNilOrEmpty(spellName)) then
             instance.frame.icon:SetTexture(select(3, GetSpellInfo(spellName)))
+        else
+            instance.frame.icon:SetTexture(nil)
         end
     end
 
-    function instance:SetSpell(spellName, elementId, isSecure)
+    function instance:ClearSpell()
+        instance.disableSpellChanged = true
+        instance.frame:SetAttribute("type", nil);
+        instance.frame:SetAttribute("spell", nil);
+
+        instance.spellName = nil
+        instance.elementId = nil
+    end
+
+    function instance:SetSpell(spellName, elementId, isSecure, isDisableSpellChanged)
+        instance.disableSpellChanged = isDisableSpellChanged or false
+
         if (not isSecure and not SamyTotemTimersUtils:StringIsNilOrEmpty(spellName)) then
             instance.frame:SetAttribute("type", "spell");
             instance.frame:SetAttribute("spell", spellName);
@@ -78,5 +93,4 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
     end
 
     return instance
-
 end

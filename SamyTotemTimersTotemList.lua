@@ -118,10 +118,15 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         local topOfScreen = UIParent:GetTop()
         local topOfParent = parentFrame:GetTop()
 
+        local firstAvailableTotem = nil
         for k, v in pairs(totemSelectList) do
             if (SamyTotemTimersUtils:IsSpellsEqual(spellToHide, v.spellName) or not v.isEnabled) then
                 v:SetVisibility(false)
+                if (not v.isEnabled and SamyTotemTimersUtils:IsSpellsEqual(castTotemButton.spellName, v.spellName)) then
+                    castTotemButton:ClearSpell()
+                end
             elseif (v.isAvailable or v:UpdateIsAvailable()) then
+                firstAvailableTotem = firstAvailableTotem or v
                 v:SetVisibility(true)
                 v:SetPosition(0, posY)
                 instance.hasPulseTotems = instance.hasPulseTotems or v.pulseTime ~= nil 
@@ -133,6 +138,15 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
                 end
 
                 posY = posY + (multiplier * (SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING))
+            end
+        end
+
+        if (not castTotemButton.spellName) then
+            if (firstAvailableTotem) then
+                castTotemButton:SetSpell(firstAvailableTotem.spellName, firstAvailableTotem.elementId, false, true)
+                castTotemButton:SetVisibility(true)
+            else
+                castTotemButton:SetVisibility(false)
             end
         end
     end
