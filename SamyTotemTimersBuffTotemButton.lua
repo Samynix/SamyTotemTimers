@@ -59,7 +59,7 @@ function SamyTotemTimersBuffTotemButton:Create(parentFrame, totemInfo, totemList
     DoWork(nil, nil)
 
     function instance:UpdateActiveTotemInfo(totemIndexChanged, latency)
-        if (not totemIndexChanged == elementId) then
+        if (totemIndexChanged ~= elementId) then
             return
         end
 
