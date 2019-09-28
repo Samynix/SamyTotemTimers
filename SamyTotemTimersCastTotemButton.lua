@@ -19,32 +19,5 @@ function SamyTotemTimersCastTotemButton:Create(parentFrame, mainFrame, totemList
         end
     ]])
 
-    function instance:SetDraggable(isDraggable)
-        if (isDraggable) then
-            originalFrameStrata = instance.frame:GetFrameStrata()
-            instance.frame:RegisterForDrag('LeftButton')
-            ActionButton_ShowOverlayGlow(instance.frame)
-            instance.frame:SetFrameStrata("TOOLTIP")
-        else
-            instance.frame:RegisterForDrag(nil)
-            ActionButton_HideOverlayGlow(instance.frame)
-            instance.frame:SetFrameStrata(originalFrameStrata)
-        end
-    end
-
-    instance.frame:SetScript("OnDragStart", function (self)
-        mainFrame:SetMovable(true)
-        mainFrame:StartMoving()
-    end)
-
-    instance.frame:SetScript("OnDragStop", function (self) 
-        mainFrame:StopMovingOrSizing()
-        mainFrame:SetMovable(false)
-        
-        if (instance.positionChanged) then
-            instance:positionChanged()
-        end
-    end)
-
     return instance
 end

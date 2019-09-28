@@ -10,6 +10,14 @@ local _db = nil
 local _samyTotemTimers = nil
 local _isSamyTotemTimersFrameLocked = true
 
+local function IsDoDbVersion(versionNumber)
+    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < versionNumber)) then
+        return true
+    end
+
+    return false
+end
+
 local function EnsureSavedVariablesExists(isReset)
     local function SetDefault(ref, default, isOverride)
         if (ref == nil or isOverride) then
@@ -19,31 +27,26 @@ local function EnsureSavedVariablesExists(isReset)
         return ref
     end
 
-    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.1)) then
+    if (IsDoDbVersion(2.1)) then
         isReset = true
         SamyTotemTimersUtils:Print("Current version incompatible with old saved variables, reseting all configuration")
     end
 
-    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.3)) then
+    if (IsDoDbVersion(2.3)) then
         SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, true)  
         SamyTotemTimersUtils:Print("Updated twist totem list with more totems, added order to totemlists")
-    end
-
-    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < 2.4)) then
-        SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, false)
-        for k, v in pairs(SamyTotemTimersDB.totemLists) do
-            for k2, v2 in pairs(v.totems) do
-                v2.isEnabled = true
-            end
-        end
-        
-        SamyTotemTimersUtils:Print("Added enable/disable to all totems")
     end
 
     local function postEnsureVariablesExists()
         for k, v in pairs(SamyTotemTimersDB.totemLists) do
             if (v.isShowPulseTimers == nil) then
                 v.isShowPulseTimers = true
+            end
+
+            for k2, v2 in pairs(v.totems) do
+                if (v2.isEnabled == nil) then
+                    v2.isEnabled = true
+                end
             end
         end
 
@@ -54,7 +57,7 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.lastUsedTotems = SetDefault(SamyTotemTimersDB.lastUsedTotems, {}, isReset)
     SamyTotemTimersDB.scale = SetDefault(SamyTotemTimersDB.scale, 1, isReset)
     SamyTotemTimersDB.position = SetDefault(SamyTotemTimersDB.position, {}, isReset)
-    SamyTotemTimersDB.position.hasChanged = SetDefault(SamyTotemTimersDB.position.hasChanged, false, isReset)
+    SamyTotemTimersDB.position.hasChanged = SetDefault(SamyTotemTimersDB.position.hasChanged, true, isReset)
     SamyTotemTimersDB.position.x = SetDefault(SamyTotemTimersDB.position.x, 0, isReset)
     SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
@@ -68,7 +71,7 @@ end
 
 function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
     _samyTotemTimers = samyTotemTimers
-    _db = EnsureSavedVariablesExists()
+    _db = EnsureSavedVariablesExists(false)
 
     local options = {
         name = 'SamyTotemTimersV2', 

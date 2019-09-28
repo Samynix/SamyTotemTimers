@@ -17,12 +17,6 @@ local function CreateCastTotemButton(totemListInstance, parentFrame, mainFrame, 
         end
     end
 
-    castTotemButton.positionChanged = function() 
-        if (totemListInstance.positionChanged) then
-            totemListInstance:positionChanged()
-        end
-    end
-
     castTotemButton:SetVisibility(false)
 
     return castTotemButton
@@ -76,20 +70,16 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
     end
 
     function instance:SetPosition(posX, posY)
-        frame:SetPoint("CENTER", parentFrame, "CENTER", posX, 0)
+        frame:SetPoint("LEFT", parentFrame, "LEFT", posX, 0)
 
         local selectListExtraHeight = SamyTotemTimersConfig.PULSESTATUSBARHEIGHT
         if (not instance.hasPulseTotems or not instance.isShowPulse) then
             selectListExtraHeight = 0
         end
 
-        selectListFrame:SetPoint("CENTER", parentFrame, "CENTER", posX,  selectListExtraHeight + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
+        selectListFrame:SetPoint("LEFT", parentFrame, "LEFT", posX,  selectListExtraHeight + SamyTotemTimersConfig.BUTTON_SIZE * 2 + SamyTotemTimersConfig.VERTICAL_SPACING * 2)
         castTotemButton:SetPosition(0, 0)
         activeTotemButton:SetPosition(0, SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.VERTICAL_SPACING)
-    end
-
-    function instance:SetDraggable(isDraggable)
-        castTotemButton:SetDraggable(isDraggable)
     end
 
     function instance:SetTotemEnabled(totemName, isEnabled) 

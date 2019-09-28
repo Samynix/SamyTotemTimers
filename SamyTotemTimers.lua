@@ -20,7 +20,7 @@ local function RefreshTotemLists(frame, isSelectTotem)
     end
 
     local totalWidth = 0
-    local counter = 1
+    local counter = 0
 
     local sortedTotemList = {}
     for k, v in pairs(_totemLists) do
@@ -31,6 +31,7 @@ local function RefreshTotemLists(frame, isSelectTotem)
             v:SetVisibility(false)
         end
     end
+
     table.sort(sortedTotemList, function(left, right)
         local leftValue = 0
         if (left and left.order) then
@@ -48,7 +49,7 @@ local function RefreshTotemLists(frame, isSelectTotem)
     for k, v in pairs(sortedTotemList) do
         if (v.isEnabled) then
             totalWidth = totalWidth + SamyTotemTimersConfig.BUTTON_SIZE + SamyTotemTimersConfig.HORIZONTAL_SPACING
-            frame:SetSize(totalWidth, SamyTotemTimersConfig.BUTTON_SIZE)
+            frame:SetSize(totalWidth - SamyTotemTimersConfig.HORIZONTAL_SPACING, SamyTotemTimersConfig.BUTTON_SIZE)
 
             v:SetVisibility(true)
             v:RefreshTotemSelectList(SamyTotemTimersDatabase:GetLastUsedTotem(v.listId))
@@ -79,11 +80,6 @@ local function CreateTotemLists(parentFrame)
             _libCallback:Fire("OnButtonContentsChanged", button:GetName(), 0, "action", spellName)
         end
 
-        totemList.positionChanged = function () 
-            SamyTotemTimersDatabase.PositionChanged()
-            RefreshTotemLists(parentFrame, false)
-        end
-
         totemLists[k] = totemList
     end
 
@@ -105,7 +101,28 @@ function _samyTotemTimers:OnInitialize()
     self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
     self.frame:SetScript("OnUpdate", self.OnUpdate) 
 
-    local totemLists, totalWidth = CreateTotemLists(self.frame)
+    self.overlayFrame = CreateFrame("Button", "SamyTotemTimersOverlayFrame", self.frame)
+    self.overlayFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5)
+    self.overlayFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5)
+    self.overlayFrame:SetFrameStrata("DIALOG")
+    self.overlayFrame:RegisterForClicks('AnyUp')
+    self.overlayFrame:RegisterForDrag('LeftButton')
+    self.overlayFrame:SetBackdrop({
+        bgFile="Interface\\ChatFrame\\ChatFrameBackground",
+        tile=true,
+        tileSize=5,
+        edgeSize= 0,
+    })
+    self.overlayFrame:SetBackdropColor(0,0,0,0.65)
+    self.overlayFrame:SetScript("OnMouseDown", function(self) self:GetParent():StartMoving() end)
+    self.overlayFrame:SetScript("OnMouseUp", function(self) 
+        self:GetParent():StopMovingOrSizing() 
+        SamyTotemTimersDatabase.PositionChanged()
+        RefreshTotemLists(self:GetParent(), false)
+    end)
+    self.overlayFrame:Hide()
+ 
+    local totemLists = CreateTotemLists(self.frame)
     _totemLists = totemLists
 
     SamyTotemTimersDatabase:RestoreScaleAndPosition()
@@ -115,10 +132,12 @@ function _samyTotemTimers:OnInitialize()
 end
 
 function _samyTotemTimers:SetDraggable(isDraggable)
-    for k, v in pairs(_totemLists) do
-        if (v.isEnabled) then
-            v:SetDraggable(isDraggable)
-        end
+    if (isDraggable) then
+        self.frame:SetMovable(true)
+        self.overlayFrame:Show()
+    else
+        self.frame:SetMovable(false)
+        self.overlayFrame:Hide()
     end
 end
 
