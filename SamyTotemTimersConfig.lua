@@ -43,7 +43,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
             ["Tremor Totem"] = {
                 ["RankOneSpellID"] = 8143,
                 ["ElementID"] = 2,
-                ["PulseTime"] = 5,
+                ["PulseTime"] = 4,
                 ["isEnabled"] = true,
             },
 
