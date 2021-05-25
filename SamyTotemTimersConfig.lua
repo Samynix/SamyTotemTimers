@@ -43,7 +43,13 @@ SamyTotemTimersConfig.defaultTotemLists = {
             ["Tremor Totem"] = {
                 ["RankOneSpellID"] = 8143,
                 ["ElementID"] = 2,
-                ["PulseTime"] = 5,
+                ["PulseTime"] = 4,
+                ["isEnabled"] = true,
+            },
+
+            ["Earth Elemental Totem"] = {
+                ["RankOneSpellID"] = 2062,
+                ["ElementID"] = 2,
                 ["isEnabled"] = true,
             }
         },
@@ -79,6 +85,18 @@ SamyTotemTimersConfig.defaultTotemLists = {
 
             ["Flametongue Totem"] = {
                 ["RankOneSpellID"] = 8227,
+                ["ElementID"] = 1,
+                ["isEnabled"] = true,
+            },
+
+            ["Totem of Wrath"] = {
+                ["RankOneSpellID"] = 30706,
+                ["ElementID"] = 1,
+                ["isEnabled"] = true,
+            },
+
+            ["Fire Elemental Totem"] = {
+                ["RankOneSpellID"] = 2894,
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
             }
@@ -173,6 +191,12 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 25908,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+            },
+
+            ["Wrath of Air Totem"] = {
+                ["RankOneSpellID"] = 3738,
+                ["ElementID"] = 4,
+                ["isEnabled"] = true,
             }
         },
         ["isEnabled"] = true,
@@ -212,6 +236,12 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["isEnabled"] = true,
             },
 
+            ["Earth Elemental Totem"] = {
+                ["RankOneSpellID"] = 2062,
+                ["ElementID"] = 2,
+                ["isEnabled"] = true,
+            },
+
             ["Searing Totem"] = {
                 ["RankOneSpellID"] = 3599,
                 ["ElementID"] = 1,
@@ -241,7 +271,18 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
             },
-        
+
+            ["Totem of Wrath"] = {
+                ["RankOneSpellID"] = 30706,
+                ["ElementID"] = 1,
+                ["isEnabled"] = true,
+            },
+
+            ["Fire Elemental Totem"] = {
+                ["RankOneSpellID"] = 2894,
+                ["ElementID"] = 1,
+                ["isEnabled"] = true,
+            },
         
             ["Healing Stream Totem"] = {
                 ["RankOneSpellID"] = 5394,
@@ -322,6 +363,12 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 25908,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+            },
+
+            ["Wrath of Air Totem"] = {
+                ["RankOneSpellID"] = 3738,
+                ["ElementID"] = 4,
+                ["isEnabled"] = true,
             }
         }, 
         ["isEnabled"] = false,
@@ -344,4 +391,16 @@ SamyTotemTimersConfig.defaultTotemLists = {
         ["name"] = "Twist",
         ["order"] = 6,
     },
+    [7] = {
+        ["totems"] = {
+            ["Totemic Call"] = {
+                ["RankOneSpellID"] = 36936,
+                ["ElementID"] = 5,
+                ["isEnabled"] = true
+            }
+        },
+        ["isEnabled"] = true,
+        ["name"] = "Recall",
+        ["order"] = 7,
+    }
 }
