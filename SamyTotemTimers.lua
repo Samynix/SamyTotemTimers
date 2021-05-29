@@ -102,7 +102,7 @@ function _samyTotemTimers:OnInitialize()
     self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
     self.frame:SetScript("OnUpdate", self.OnUpdate) 
 
-    self.overlayFrame = CreateFrame("Button", "SamyTotemTimersOverlayFrame", self.frame)
+    self.overlayFrame = CreateFrame("Button", "SamyTotemTimersOverlayFrame", self.frame, BackdropTemplateMixin and "BackdropTemplate")
     self.overlayFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5)
     self.overlayFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5)
     self.overlayFrame:SetFrameStrata("DIALOG")
