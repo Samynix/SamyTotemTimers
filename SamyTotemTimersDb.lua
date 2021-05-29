@@ -50,6 +50,15 @@ local function EnsureSavedVariablesExists(isReset)
             end
         end
 
+        --Ensure all totems are in config
+        for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
+            for k2, totem in pairs(element["totems"]) do
+                if not SamyTotemTimersDB.totemLists[k]["totems"][k2] then
+                    SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
+                end
+            end
+        end
+
         SamyTotemTimersDB.version = 2.4
     end
 
