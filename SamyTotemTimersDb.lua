@@ -52,9 +52,15 @@ local function EnsureSavedVariablesExists(isReset)
 
         --Ensure all totems are in config
         for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
-            for k2, totem in pairs(element["totems"]) do
-                if not SamyTotemTimersDB.totemLists[k]["totems"][k2] then
-                    SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
+            if not SamyTotemTimersDB.totemLists[k] then
+                SamyTotemTimersDB.totemLists[k] = element
+                SamyTotemTimersUtils:Print("Added missing totemlist " .. k)
+            else
+                for k2, totem in pairs(element["totems"]) do
+                    if not SamyTotemTimersDB.totemLists[k]["totems"][k2] then
+                        SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
+                        SamyTotemTimersUtils:Print("Added missing totem " .. k2 .. " to totem list " .. k)
+                    end
                 end
             end
         end
