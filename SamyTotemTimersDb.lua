@@ -119,6 +119,22 @@ function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
                 func = 'ToggleLock',
             },
 
+            general = {
+                order = 3,
+                type = 'group',
+                name = 'General',
+                args = {
+                    isAffectedEnabled = {
+                        order = 1,
+                        name = "Indicate if affected",
+                        desc = "Highlights selected totem if you have buff from it, only works on some totems",
+                        type = "toggle",
+                        set = function(info, newValue) SamyTotemTimersDatabase:SetAffectedEnabled(newValue) end,
+                        get = function() return SamyTotemTimersDatabase:GetAffectedEnabled() end,
+                    },
+                }
+            },
+
             totems = {
                 order = 3,
                 type = 'group',
@@ -222,6 +238,15 @@ function SamyTotemTimersDatabase:RestoreScaleAndPosition()
     end
 
     _samyTotemTimers.frame:SetScale(_db.scale)
+end
+
+function SamyTotemTimersDatabase:SetAffectedEnabled(isEnabled)
+    SamyTotemTimersUtils:Print('Affected set to ' .. tostring(isEnabled))
+    _db.isAffectedEnabled = isEnabled
+end
+
+function SamyTotemTimersDatabase:GetAffectedEnabled()
+    return _db.isAffectedEnabled
 end
 
 function SamyTotemTimersDatabase:GetLastUsedTotem(totemListId)
