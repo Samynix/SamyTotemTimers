@@ -27,6 +27,7 @@ function SamyTotemTimersSelectTotemButton:Create(parentFrame, totemInfo, castTot
 
     instance.frame:HookScript("OnMouseDown", function(self, button)
         if (button == "RightButton") then
+            --print('rightbutton', instance.hasBuff)
             castTotemButton:SetSpell(instance.spellName, instance.elementId, true)
         end
     end)
@@ -42,6 +43,7 @@ function SamyTotemTimersSelectTotemButton:Create(parentFrame, totemInfo, castTot
         end
 
         if (not instance.isAvailable) then
+            --print("'notavailable", instance.hasBuff)
             instance:SetSpell(spellName, totemInfo["ElementID"])
         end
 

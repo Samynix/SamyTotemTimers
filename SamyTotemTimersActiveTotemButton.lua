@@ -1,5 +1,20 @@
 SamyTotemTimersActiveTotemButton = {}
 
+local function CreateMissingBuffOverlay(parentFrame)
+    local frame = CreateFrame("Frame", nil, parentFrame)
+    frame:SetFrameStrata("TOOLTIP")
+    frame:SetWidth(parentFrame:GetWidth()) 
+    frame:SetHeight(parentFrame:GetHeight())
+
+    local texture = frame:CreateTexture(nil,"TOOLTIP")
+    texture:SetColorTexture(1, 0, 0, 0.4)
+    texture:SetAllPoints(frame)
+    frame.texture = texture
+    
+    frame:SetPoint("CENTER", 0, 0)
+    return frame
+end
+
 local function CreatePulseStatusBar(parentFrame)
     local statusbar = CreateFrame("StatusBar", nil, parentFrame)
     statusbar:SetPoint("BOTTOM", parentFrame, "TOP", 0, 0)
@@ -38,6 +53,9 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     instance.affectedFontString:SetPoint("TOP", instance.frame, "TOP", 0, -2)
     instance.affectedFontString:Hide()
 
+    instance.missingBuffOverlay = CreateMissingBuffOverlay(instance.frame)
+    instance.missingBuffOverlay:Hide()
+
     function instance:SetVisibility(isVisible) end --override
 
     function instance:SetIsShowPulse(isShowPulse)
@@ -55,7 +73,8 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             ["spellName"] = spellName,
             ["pulseTime"] = v["PulseTime"],
             ["buffDuration"] = v["BuffDuration"],
-            ["elementId"] = v["ElementID"]
+            ["elementId"] = v["ElementID"],
+            ["hasBuff"] = v["hasBuff"],
         })
     end
 
@@ -72,6 +91,7 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
 
         instance:SetTexture(instance.activeTotem.spellName)
         instance:SetSpell(instance.activeTotem.spellName, instance.activeTotem.elementId, true)
+        instance:SetHasBuff(instance.activeTotem.hasBuff)
 
         if (instance.activeTotem.pulseTime and instance.isShowPulse) then
             local pulseTime = instance.activeTotem.pulseTime - timeLeft % instance.activeTotem.pulseTime
@@ -123,9 +143,19 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             local units = { "player", "party1", "party2", "party3", "party4" }
             for k, v in pairs(units) do
                 local buffs = SamyTotemTimersUtils:GetUnitBuffs(v)
+                local foundBuff = false
                 for k2, v2 in pairs(buffs) do
                     if (string.match(instance.spellName, v2.name)) then
                         affected = affected + 1
+                        foundBuff = true
+                    end
+                end
+
+                if v == "player" then
+                    if SamyTotemTimersDB.isWarnIfMissingBuff and instance.hasBuff and not foundBuff then
+                        instance.missingBuffOverlay:Show()
+                    else
+                        instance.missingBuffOverlay:Hide()
                     end
                 end
             end

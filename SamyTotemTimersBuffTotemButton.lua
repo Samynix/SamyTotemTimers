@@ -22,6 +22,7 @@ function SamyTotemTimersBuffTotemButton:Create(parentFrame, totemInfo, totemList
     local spellName = GetSpellInfo(totemInfo["RankOneSpellID"])
     local pulseTime = totemInfo["PulseTime"]
     local buffDuration = totemInfo["BuffDuration"]
+    local hasBuff = totemInfo["hasBuff"]
 
     local function DoWork(currentBuffTimeLeft, timestampLastCalculation)
         if (not instance.hasTotem and (not currentBuffTimeLeft or not timestampLastCalculation)) then
@@ -37,10 +38,10 @@ function SamyTotemTimersBuffTotemButton:Create(parentFrame, totemInfo, totemList
         end
         
         timestampLastCalculation = GetTime()
-
         if (currentBuffTimeLeft > 0) then
             instance:SetTexture(spellName)
             instance:SetSpell(spellName, totemIndex, true)
+            instance:SetHasBuff(hasBuff)
 
             local d, h, m, s = ChatFrame_TimeBreakDown(currentBuffTimeLeft)
             instance.frame.Count:SetFormattedText("%01d:%02d", m, s)

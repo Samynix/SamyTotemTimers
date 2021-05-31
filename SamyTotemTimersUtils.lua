@@ -14,6 +14,13 @@ function SamyTotemTimersUtils:Round(number, decimals)
     return (("%%.%df"):format(decimals)):format(number)
 end
 
+function SamyTotemTimersUtils:PrintMyBuffs()
+    for i=1,40 do 
+        local name, _ , _ , _ , _ , _ , _ , _ , _, id = UnitBuff("player",i); 
+        if name then 
+            SamyTotemTimersUtils:Print(i.."=".. name .. " - " .. tostring(id)) end end
+end
+
 function SamyTotemTimersUtils:Trim(string)
     return string:match'^%s*(.*%S)' or ''
  end

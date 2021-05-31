@@ -38,18 +38,6 @@ local function EnsureSavedVariablesExists(isReset)
     end
 
     local function postEnsureVariablesExists()
-        for k, v in pairs(SamyTotemTimersDB.totemLists) do
-            if (v.isShowPulseTimers == nil) then
-                v.isShowPulseTimers = true
-            end
-
-            for k2, v2 in pairs(v.totems) do
-                if (v2.isEnabled == nil) then
-                    v2.isEnabled = true
-                end
-            end
-        end
-
         --Ensure all totems are in config
         for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
             if not SamyTotemTimersDB.totemLists[k] then
@@ -61,6 +49,23 @@ local function EnsureSavedVariablesExists(isReset)
                         SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
                         SamyTotemTimersUtils:Print("Added missing totem " .. k2 .. " to totem list " .. k)
                     end
+                end
+            end
+        end
+
+        for k, v in pairs(SamyTotemTimersDB.totemLists) do
+            if (v.isShowPulseTimers == nil) then
+                v.isShowPulseTimers = true
+            end
+
+            for k2, v2 in pairs(v.totems) do
+                if (v2.isEnabled == nil) then
+                    v2.isEnabled = true
+                end
+
+                local defaultHasBuff = SamyTotemTimersConfig.defaultTotemLists[k]["totems"][k2]["hasBuff"]
+                if (v2.hasBuff == nil and defaultHasBuff ~= nil) then
+                    v2.hasBuff = defaultHasBuff
                 end
             end
         end
@@ -124,13 +129,13 @@ function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
                 type = 'group',
                 name = 'General',
                 args = {
-                    isAffectedEnabled = {
+                    isWarnIfMissingBuff = {
                         order = 1,
-                        name = "Indicate if affected",
-                        desc = "Highlights selected totem if you have buff from it, only works on some totems",
+                        name = "Overlay if missing buff",
+                        desc = "Show warning overlay if player is missing buff from active totem",
                         type = "toggle",
-                        set = function(info, newValue) SamyTotemTimersDatabase:SetAffectedEnabled(newValue) end,
-                        get = function() return SamyTotemTimersDatabase:GetAffectedEnabled() end,
+                        set = function(info, newValue) SamyTotemTimersDatabase:SetWarnIfMissingBuffEnabled(newValue) end,
+                        get = function() return SamyTotemTimersDatabase:GetWarnIfMissingBuffEnabled() end,
                     },
                 }
             },
@@ -240,13 +245,12 @@ function SamyTotemTimersDatabase:RestoreScaleAndPosition()
     _samyTotemTimers.frame:SetScale(_db.scale)
 end
 
-function SamyTotemTimersDatabase:SetAffectedEnabled(isEnabled)
-    SamyTotemTimersUtils:Print('Affected set to ' .. tostring(isEnabled))
-    _db.isAffectedEnabled = isEnabled
+function SamyTotemTimersDatabase:SetWarnIfMissingBuffEnabled(isEnabled)
+    _db.isWarnIfMissingBuff = isEnabled
 end
 
-function SamyTotemTimersDatabase:GetAffectedEnabled()
-    return _db.isAffectedEnabled
+function SamyTotemTimersDatabase:GetWarnIfMissingBuffEnabled()
+    return _db.isWarnIfMissingBuff
 end
 
 function SamyTotemTimersDatabase:GetLastUsedTotem(totemListId)

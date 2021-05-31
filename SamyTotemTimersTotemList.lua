@@ -107,6 +107,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         end
 
         if (totemSelectButton) then
+            --print('SetSelectedTotem', totemSelectButton.hasBuff)
             castTotemButton:SetSpell(totemSelectButton.spellName, totemSelectButton.elementId, false)
             castTotemButton:SetVisibility(true)
         end
@@ -143,6 +144,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
 
         if (not castTotemButton.spellName) then
             if (firstAvailableTotem) then
+                --print("firstAvaiableTotem", firstAvailableTotem.hasBuff)
                 castTotemButton:SetSpell(firstAvailableTotem.spellName, firstAvailableTotem.elementId, false, true)
                 castTotemButton:SetVisibility(true)
             else

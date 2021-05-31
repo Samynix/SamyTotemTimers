@@ -59,6 +59,7 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
 
         instance.spellName = nil
         instance.elementId = nil
+        instance.hasBuff = nil
     end
 
     function instance:SetSpell(spellName, elementId, isSecure, isDisableSpellChanged)
@@ -71,6 +72,10 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
 
         instance.spellName = spellName
         instance.elementId = elementId
+    end
+
+    function instance:SetHasBuff(hasBuff)
+        instance.hasBuff = hasBuff
     end
     
     function instance:SetPosition(x, y)

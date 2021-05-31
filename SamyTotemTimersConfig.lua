@@ -20,6 +20,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8071,
                 ["ElementID"] = 2,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Earthbind Totem"] = {
@@ -38,6 +39,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8075,
                 ["ElementID"] = 2,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Tremor Totem"] = {
@@ -75,6 +77,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8181,
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
 
             ["Magma Totem"] = {
@@ -93,6 +96,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 30706,
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
 
             ["Fire Elemental Totem"] = {
@@ -111,24 +115,28 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 5394,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Mana Spring Totem"] = {
                 ["RankOneSpellID"] = 5675,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Fire Resistance Totem"] = {
                 ["RankOneSpellID"] = 8184,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Mana Tide Totem"] = {
                 ["RankOneSpellID"] = 16190,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Disease Cleansing Totem"] = {
@@ -153,18 +161,21 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8835,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Nature Resistance Totem"] = {
                 ["RankOneSpellID"] = 10595,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Windwall Totem"] = {
                 ["RankOneSpellID"] = 15107,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
     
             ["Windfury Totem"] = {
@@ -179,6 +190,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["ElementID"] = 4,
                 ["PulseTime"] = 10,
                 ["isEnabled"] = true,
+                --["hasBuff"] = true,
             },
     
             ["Sentry Totem"] = {
@@ -191,12 +203,14 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 25908,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
 
             ["Wrath of Air Totem"] = {
                 ["RankOneSpellID"] = 3738,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             }
         },
         ["isEnabled"] = true,
@@ -209,6 +223,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8071,
                 ["ElementID"] = 2,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Earthbind Totem"] = {
@@ -227,6 +242,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8075,
                 ["ElementID"] = 2,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Tremor Totem"] = {
@@ -258,6 +274,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8181,
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Magma Totem"] = {
@@ -276,6 +293,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 30706,
                 ["ElementID"] = 1,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
 
             ["Fire Elemental Totem"] = {
@@ -288,24 +306,28 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 5394,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Mana Spring Totem"] = {
                 ["RankOneSpellID"] = 5675,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Fire Resistance Totem"] = {
                 ["RankOneSpellID"] = 8184,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Mana Tide Totem"] = {
                 ["RankOneSpellID"] = 16190,
                 ["ElementID"] = 3,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Disease Cleansing Totem"] = {
@@ -324,18 +346,21 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 8835,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Nature Resistance Totem"] = {
                 ["RankOneSpellID"] = 10595,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Windwall Totem"] = {
                 ["RankOneSpellID"] = 15107,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
         
             ["Windfury Totem"] = {
@@ -351,6 +376,7 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["ElementID"] = 4,
                 ["PulseTime"] = 10,
                 ["isEnabled"] = true,
+             --   ["hasBuff"] = true,
             },
         
             ["Sentry Totem"] = {
@@ -363,12 +389,14 @@ SamyTotemTimersConfig.defaultTotemLists = {
                 ["RankOneSpellID"] = 25908,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             },
 
             ["Wrath of Air Totem"] = {
                 ["RankOneSpellID"] = 3738,
                 ["ElementID"] = 4,
                 ["isEnabled"] = true,
+                ["hasBuff"] = true,
             }
         }, 
         ["isEnabled"] = false,
