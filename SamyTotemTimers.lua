@@ -197,7 +197,6 @@ end
 
 _samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex)
     local latency = MeasureLatency()
-
     for k, v in pairs(_totemLists) do
         if (v.isEnabled) then
             v:UpdateActiveTotemInfo(totemIndex, latency)
@@ -220,6 +219,30 @@ end)
 
 _samyTotemTimers:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", function(event) 
     _castChangedTime = GetTime()
+end)
+
+local function ResetAllActive()
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v:ResetActiveTotem()
+        end
+    end
+end
+
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED_INDOORS", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED_NEW_AREA", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("PLAYER_DEAD", function(event)
+    ResetAllActive()
 end)
 
 

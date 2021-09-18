@@ -165,6 +165,10 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
         activeTotemButton:UpdateActiveTotemInfo(totemIndexChanged, delay)
     end
 
+    function instance:ResetActiveTotem()
+        activeTotemButton:ResetAndHide()
+    end
+
     function instance:UpdateActiveTotemAffectedCount()
         activeTotemButton:UpdateActiveTotemAffectedCount()
     end

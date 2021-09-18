@@ -79,15 +79,16 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     end
 
     local function DoWork()
-        if (not instance.hasTotem) then
-            instance:SetSpell(nil, nil)
-            instance.frame:Hide()
-
+        local duration = instance.duration and instance.duration or 0
+        local startTime = instance.startTime and instance.startTime or 0
+        local timeLeft = duration + startTime - GetTime()
+        if (not instance.hasTotem or timeLeft <= 0) then
+            instance:ResetAndHide()
             C_Timer.NewTimer(0.1, function() DoWork() end)
             return
         end
 
-        local timeLeft = instance.duration + instance.startTime - GetTime()
+        
 
         instance:SetTexture(instance.activeTotem.spellName)
         instance:SetSpell(instance.activeTotem.spellName, instance.activeTotem.elementId, true)
@@ -113,8 +114,6 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
         C_Timer.NewTimer(0.1, function() DoWork() end)
     end
 
-    DoWork()
-
     function instance:UpdateActiveTotemInfo(totemIndexChanged, latency)
         if (not elementTotemDictionary[totemIndexChanged]) then
             return
@@ -133,8 +132,14 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             end
         end
 
+        instance:ResetAndHide()
+    end
+
+    function instance:ResetAndHide()
+        instance:SetSpell(nil, nil)
         instance.activeTotem = nil
         instance.hasTotem = false
+        instance.frame:Hide()
     end
 
     function instance:UpdateActiveTotemAffectedCount()
@@ -169,5 +174,6 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
         end
     end
 
+    DoWork()
     return instance
 end

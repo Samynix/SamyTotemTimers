@@ -37,6 +37,7 @@ function SamyTotemTimersBuffTotemButton:Create(parentFrame, totemInfo, totemList
             currentBuffTimeLeft = currentBuffTimeLeft - (GetTime() - timestampLastCalculation)
         end
         
+        print('jalla')
         timestampLastCalculation = GetTime()
         if (currentBuffTimeLeft > 0) then
             instance:SetTexture(spellName)
