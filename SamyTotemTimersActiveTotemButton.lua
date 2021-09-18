@@ -36,9 +36,10 @@ local function CreatePulseStatusBar(parentFrame)
     return statusbar
 end
 
-function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId, castTotemButton, isOnlyShowSelectedTotem)
+function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId, castTotemButton, isOnlyShowSelectedTotem, wfBuffList)
     local templates = "ActionButtonTemplate"
     local instance = SamyTotemTimersButtonBase:Create(parentFrame, "SamyTotemTimers" .. totemListId .. "ActiveTotemButton", templates)
+    instance.wfBuffList = wfBuffList
     instance.pulseStatusBar = CreatePulseStatusBar(instance.frame)
     instance.frame:SetEnabled(false)
     instance.frame.NormalTexture:Hide()
@@ -145,14 +146,17 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     function instance:UpdateActiveTotemAffectedCount()
         if (instance.spellName) then
             local affected = 0
+            local missingPrereq = 0
             local units = { "player", "party1", "party2", "party3", "party4" }
             for k, v in pairs(units) do
-                local buffs = SamyTotemTimersUtils:GetUnitBuffs(v)
+                local buffs = SamyTotemTimersUtils:GetUnitBuffs(v, instance.wfBuffList)
                 local foundBuff = false
                 for k2, v2 in pairs(buffs) do
-                    if (string.match(instance.spellName, v2.name)) then
+                    if (string.match(instance.spellName, v2.name) and not v2.missingPrereq and v2.expirationTime > GetTime()) then
                         affected = affected + 1
                         foundBuff = true
+                    elseif (v2.missingPrereq) then
+                        missingPrereq = missingPrereq + 1
                     end
                 end
 
@@ -166,8 +170,13 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             end
 
             if (affected > 0) then
+                local affectedString = tostring(affected)
+                if (missingPrereq > 0) then
+                    affectedString = affectedString .. '/' .. "|cFFFF0000" .. tostring(missingPrereq)
+                end
+
                 instance.affectedFontString:Show()
-                instance.affectedFontString:SetText(tostring(affected))
+                instance.affectedFontString:SetText(tostring(affectedString))
             else
                 instance.affectedFontString:Hide()
             end

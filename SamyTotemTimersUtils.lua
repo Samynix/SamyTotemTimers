@@ -52,18 +52,34 @@ function SamyTotemTimersUtils:IsSpellsEqual(spellOne, spellTwo)
     return spellOne == spellTwo
 end
 
-function SamyTotemTimersUtils:GetUnitBuffs(unit)
+function SamyTotemTimersUtils:GetUnitBuffs(unit, additional_buffs_by_guid)
     local buffList = {}
+
+    local unitGuid = UnitGUID(unit)
+    if additional_buffs_by_guid and additional_buffs_by_guid[unitGuid] then
+        table.insert(buffList, 
+        { 
+            ["name"] = 'Windfury Totem',
+            ["duration"] = additional_buffs_by_guid[unitGuid].duration,
+            ["expirationTime"] = GetTime() + (additional_buffs_by_guid[unitGuid].expirationTime / 1000),
+            ["unitCaster"] = nil,
+            ["spellId"] = nil,
+            ["missingPrereq"] = additional_buffs_by_guid[unitGuid].missingPrereq,
+        }) 
+    end
+
     for i=1, 40 do
-        local name, _, _, _, _, duration, expirationTime, unitCaster, _, _, spellId = UnitBuff(unit, i)
+        local name, _, _, _, duration, expirationTime, unitCaster, _, _, spellId = UnitBuff(unit, i)
         if (name) then
+            expirationTime = (expirationTime and expirationTime > 0) and expirationTime or 1000
             table.insert(buffList, 
                 { 
                     ["name"] = name,
                     ["duration"] = duration,
-                    ["expirationTime"] = expirationTime,
+                    ["expirationTime"] = GetTime() + (tonumber(expirationTime) / 1000),
                     ["unitCaster"] = unitCaster,
-                    ["spellId"] = spellId
+                    ["spellId"] = spellId,
+                    ["missingPrereq"] = false,
                 }       
             )
         end

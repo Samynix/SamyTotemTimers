@@ -22,8 +22,8 @@ local function CreateCastTotemButton(totemListInstance, parentFrame, mainFrame, 
     return castTotemButton
 end
 
-local function CreateActiveTotemButton(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
-    local activeTotemButton = SamyTotemTimersActiveTotemButton:Create(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem)
+local function CreateActiveTotemButton(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, wfBuffList)
+    local activeTotemButton = SamyTotemTimersActiveTotemButton:Create(parentFrame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, wfBuffList)
     return activeTotemButton
 end
 
@@ -40,9 +40,8 @@ local function CreateTotemSelectButtons(selectListFrame, totemInfoList, castTote
     return totemSelectList
 end
 
-function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem, isShowBuffDuration)
+function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList, isOnlyShowTimerForSelectedTotem, isShowBuffDuration, wfBuffList)
     local instance = {}
-
     local frame = CreateFrame("Frame", "SamyTotemTimersTotemFrame" .. totemListId, parentFrame)
     frame:SetSize(SamyTotemTimersConfig.BUTTON_SIZE, SamyTotemTimersConfig.BUTTON_SIZE)
 
@@ -53,7 +52,7 @@ function SamyTotemTimersTotemList:Create(parentFrame, totemListId, totemInfoList
     if (isShowBuffDuration) then
         activeTotemButton = SamyTotemTimersBuffTotemButton:Create(frame, SamyTotemTimersUtils:FirstOrDefault(totemInfoList), totemListId)
     else
-        activeTotemButton =  CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, isShowPulse)
+        activeTotemButton =  CreateActiveTotemButton(frame, totemInfoList, totemListId, castTotemButton, isOnlyShowTimerForSelectedTotem, wfBuffList)
     end
 
     local totemSelectList = CreateTotemSelectButtons(selectListFrame, totemInfoList, castTotemButton)

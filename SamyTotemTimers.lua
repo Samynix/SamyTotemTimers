@@ -5,9 +5,16 @@ local _libCallback = LibStub("CallbackHandler-1.0"):New(_samyTotemTimers)
 
 
 local _totemLists = {}
+local  _wfTotemList = {}
 local _isUpdateTotemLists = false
 local _timeSinceLastUpdate = 0
 local _castChangedTime = nil
+
+local COMM_PREFIX_OLD = "WFC01"
+local COMM_PREFIX = "WF_STATUS"
+
+C_ChatInfo.RegisterAddonMessagePrefix(COMM_PREFIX)
+C_ChatInfo.RegisterAddonMessagePrefix(COMM_PREFIX_OLD)
 
 local function IsPlayerShaman()
     local localizedClass, englishClass, classIndex = UnitClass("player");
@@ -71,7 +78,7 @@ local function CreateTotemLists(parentFrame)
     local totemLists = {}
 
     for k, v in pairs(SamyTotemTimersDatabase:GetTotemLists()) do
-        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"], v["isShowBuffDuration"])
+        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"], v["isShowBuffDuration"], _wfTotemList)
         totemList:SetEnabled(v["isEnabled"])
         totemList:SetOrder(v["order"])
         totemList:SetIsShowPulse(v.isShowPulseTimers)
@@ -98,10 +105,10 @@ function _samyTotemTimers:OnInitialize()
     end)
 
     SamyTotemTimersDatabase:OnInitialize(self)
-
+    _samyTotemTimers:UpdateGroupRooster()
+    
     self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
-    self.frame:SetScript("OnUpdate", self.OnUpdate) 
-
+    self.frame:SetScript("OnUpdate", self.OnUpdate)
     self.overlayFrame = CreateFrame("Button", "SamyTotemTimersOverlayFrame", self.frame, BackdropTemplateMixin and "BackdropTemplate")
     self.overlayFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5)
     self.overlayFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5)
@@ -171,9 +178,59 @@ function _samyTotemTimers:OnUpdate(elapsed)
         return
     end
 
+    local playerGuid = UnitGUID("player")
+    local hasWepEnchant, expire = GetWeaponEnchantInfo("player")
+    if (_wfTotemList[playerGuid]) then
+        _wfTotemList[playerGuid].duration = hasWepEnchant and 1 or 0
+        _wfTotemList[playerGuid].expirationTime = hasWepEnchant and expire or 0
+        _wfTotemList[playerGuid].missingPrereq = false
+    end
+
     _timeSinceLastUpdate = 0
     for k, v in pairs(_totemLists) do
         v:UpdateActiveTotemAffectedCount()
+    end
+
+
+    -- print(table.getn(_samyTotemTimers.wfData))
+    -- for k, v in pairs(_samyTotemTimers.wfData) do
+    --     print(k, v.hasWepEnchant, v.hasWfCom)
+    -- end
+end
+
+function _samyTotemTimers:UpdateGroupRooster()
+    local function addPlayerData(unitId)
+        local playerGuid = UnitGUID(unitId)
+        if not playerGuid then
+            return nil
+        end
+        
+        _wfTotemList[playerGuid] = 
+        {
+            guid = playerGuid,
+            missingPrereq = true,
+            expirationTime = 0,
+            duration = 0
+        }
+
+        return playerGuid
+    end
+    
+    local unitGuids = {}
+    unitGuids[addPlayerData("player")] = true
+    for index=1,4 do
+        local guid = addPlayerData("party" .. index)
+        if (guid) then
+            unitGuids[guid] = true
+        end
+    end
+
+    for k, v in pairs(_wfTotemList) do
+        if (not unitGuids[k]) then 
+            print(k, v)
+            table.remove(_wfTotemList, k)
+            print('removed')
+        end
     end
 end
 
@@ -245,5 +302,47 @@ _samyTotemTimers:RegisterEvent("PLAYER_DEAD", function(event)
     ResetAllActive()
 end)
 
+_samyTotemTimers:RegisterEvent("GROUP_ROSTER_UPDATE", function(event)
+    _samyTotemTimers:UpdateGroupRooster()
+end)
 
+_samyTotemTimers:RegisterEvent("CHAT_MSG_ADDON", function(event, prefix, message, channel, sender)
+	if(prefix == COMM_PREFIX_OLD ) then -- wf com old API
+		local commType, expiration, lag, gGUID = strsplit(":", message)
+		-- local expiration, lag = tonumber(expiration), tonumber(lag)
+		if(not _wfTotemList[gGUID] ) then 
+            return 
+        end
+
+        print('old', gGUID)
+		if( commType == "W" ) then -- message w/ wf duration, should always fire on application)
+            _wfTotemList[gGUID].duration = 1
+            _wfTotemList[gGUID].expirationTime = expiration
+            _wfTotemList[gGUID].missingPrereq = false
+		elseif( commType == "E" ) then -- message wf lost
+            _wfTotemList[gGUID].duration = 0
+            _wfTotemList[gGUID].expirationTime = 0
+            _wfTotemList[gGUID].missingPrereq = false
+		elseif( commType == "I") then -- message signaling that unit has addon installed
+			_wfTotemList[gGUID].missingPrereq = false
+		end
+
+	elseif( prefix == COMM_PREFIX ) then --wf com new API
+		local gGUID, spellID, expiration, lag = strsplit(':', message)
+        if(not _wfTotemList[gGUID] ) then 
+            return 
+        end
+
+		local spellID, expire, lagHome = tonumber(spellID), tonumber(expiration), tonumber(lagHome)
+		if spellID then --update buffs
+            _wfTotemList[gGUID].duration = 1
+            _wfTotemList[gGUID].expirationTime = expire
+            _wfTotemList[gGUID].missingPrereq = false
+		else --if( not spellID ) then --addon installed or buff expired
+            _wfTotemList[gGUID].duration = 0
+            _wfTotemList[gGUID].expirationTime = 0
+            _wfTotemList[gGUID].missingPrereq = false
+		end
+	end
+end)
 
