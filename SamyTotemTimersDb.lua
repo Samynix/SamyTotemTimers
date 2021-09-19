@@ -19,8 +19,6 @@ local function EnsureSavedVariablesExists(isReset)
         return ref
     end
 
-    SamyTotemTimersDbVersion:UpdateDatabase(SamyTotemTimersDB, false, SetDefault)
-
     SamyTotemTimersDB = SetDefault(SamyTotemTimersDB, {}, isReset)
     SamyTotemTimersDB.lastUsedTotems = SetDefault(SamyTotemTimersDB.lastUsedTotems, {}, isReset)
     SamyTotemTimersDB.scale = SetDefault(SamyTotemTimersDB.scale, 1, isReset)
@@ -30,6 +28,8 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.position.y = SetDefault(SamyTotemTimersDB.position.y, 0, isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
     SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, isReset)
+
+    SamyTotemTimersDbVersion:UpdateDatabase(SamyTotemTimersDB, isReset, SetDefault)
     
     --Ensure all totems are in config
     for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
@@ -71,7 +71,7 @@ function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
     _db = EnsureSavedVariablesExists(false)
 
     local options = {
-        name = 'SamyTotemTimersV2', 
+        name = 'SamyTotemTimers ' .. SamyTotemTimersConfig.Version, 
         type = "group",
         handler = self,
         args = {
@@ -122,9 +122,36 @@ function SamyTotemTimersDatabase:OnInitialize(samyTotemTimers)
                 type = 'group',
                 name = 'Totems',
                 args = {}
+            },
+
+            windfury = {
+                order = 4,
+                type = 'group',
+                name = 'Windfury',
+                desc = "What classes should be counted for wf buffs. WF buffs needes LibWFCom",
+                args = {
+                    info = {
+                        order = 0,
+                        type = "description",
+                        name = "Windfury affected count requires people to have LibWFCom.\n" ..
+                                "WF buff shows as x / y where y is count of people in group with LibWFCom.\n" ..
+                                "\n" ..
+                                "What classes do you want to count in x / y?"
+                    }
+                }
             }
-        }
+        },
     }
+
+    for k, v in pairs(_db.wfComClass) do
+        options.args.windfury.args[k] =
+        {
+            type = "toggle",
+            name = k,
+            set = function(info, newValue) SamyTotemTimersDatabase:SetWFComLibClass(k, newValue) end,
+            get = function() return SamyTotemTimersDatabase:GetWFComLibClass(k) end,
+        }
+    end
 
     for k, v in pairs(_db.totemLists) do
         local key = tostring(k)
@@ -322,6 +349,20 @@ function SamyTotemTimersDatabase:ToggleLock()
     else
         SamyTotemTimersUtils:Print("Frame unlocked")
     end
+end
+
+
+function SamyTotemTimersDatabase:SetWFComLibClass(class, newValue)
+    _db.wfComClass[class] = newValue
+    SamyTotemTimersWFCom:UpdateGroupRooster()
+end
+
+function SamyTotemTimersDatabase:GetWFComLibClass(class)
+    if not _db.wfComClass then
+        _db.wfComClass = {}
+    end
+
+    return _db.wfComClass[class]
 end
 
 function SamyTotemTimersDatabase:ResetConfig()

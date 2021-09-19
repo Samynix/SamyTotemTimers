@@ -5,6 +5,7 @@ local _libCallback = LibStub("CallbackHandler-1.0"):New(_samyTotemTimers)
 
 
 local _totemLists = {}
+local  _wfTotemList = {}
 local _isUpdateTotemLists = false
 local _timeSinceLastUpdate = 0
 local _castChangedTime = nil
@@ -71,7 +72,7 @@ local function CreateTotemLists(parentFrame)
     local totemLists = {}
 
     for k, v in pairs(SamyTotemTimersDatabase:GetTotemLists()) do
-        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"], v["isShowBuffDuration"])
+        local totemList = SamyTotemTimersTotemList:Create(parentFrame, k, v["totems"], v["IsOnlyShowTimerForSelectedTotem"], v["isShowBuffDuration"], SamyTotemTimersWFCom.WfStatusList)
         totemList:SetEnabled(v["isEnabled"])
         totemList:SetOrder(v["order"])
         totemList:SetIsShowPulse(v.isShowPulseTimers)
@@ -98,10 +99,10 @@ function _samyTotemTimers:OnInitialize()
     end)
 
     SamyTotemTimersDatabase:OnInitialize(self)
+    SamyTotemTimersWFCom:UpdateGroupRooster()
 
     self.frame = CreateFrame("Frame", "SamyTotemTimersFrame", UIParent)
-    self.frame:SetScript("OnUpdate", self.OnUpdate) 
-
+    self.frame:SetScript("OnUpdate", self.OnUpdate)
     self.overlayFrame = CreateFrame("Button", "SamyTotemTimersOverlayFrame", self.frame, BackdropTemplateMixin and "BackdropTemplate")
     self.overlayFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5)
     self.overlayFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5)
@@ -129,6 +130,7 @@ function _samyTotemTimers:OnInitialize()
     SamyTotemTimersDatabase:RestoreScaleAndPosition()
     self.frame:Show()
 
+    SamyTotemTimersWFCom:UpdateGroupRooster()
     SamyTotemTimersUtils:Print("Loaded")
 end
 
@@ -171,11 +173,48 @@ function _samyTotemTimers:OnUpdate(elapsed)
         return
     end
 
+
+    SamyTotemTimersWFCom:UpdatePlayer()
     _timeSinceLastUpdate = 0
     for k, v in pairs(_totemLists) do
         v:UpdateActiveTotemAffectedCount()
     end
 end
+
+-- function _samyTotemTimers:UpdateGroupRooster()
+--     local function addPlayerData(unitId)
+--         local playerGuid = UnitGUID(unitId)
+--         if not playerGuid then
+--             return nil
+--         end
+        
+--         local _, unitClass = UnitClass(unitId)
+--         _wfTotemList[playerGuid] = 
+--         {
+--             guid = playerGuid,
+--             missingPrereq = SamyTotemTimersDB.wfComClass[unitClass],
+--             expirationTime = 0,
+--             duration = 0
+--         }
+
+--         return playerGuid
+--     end
+    
+--     local unitGuids = {}
+--     unitGuids[addPlayerData("player")] = true
+--     for index=1,4 do
+--         local guid = addPlayerData("party" .. index)
+--         if (guid) then
+--             unitGuids[guid] = true
+--         end
+--     end
+
+--     for k, v in pairs(_wfTotemList) do
+--         if (not unitGuids[k]) then 
+--             _wfTotemList[k] = nil
+--         end
+--     end
+-- end
 
 _samyTotemTimers:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", function()
     for k, v in pairs(_totemLists) do
@@ -197,7 +236,6 @@ end
 
 _samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex)
     local latency = MeasureLatency()
-
     for k, v in pairs(_totemLists) do
         if (v.isEnabled) then
             v:UpdateActiveTotemInfo(totemIndex, latency)
@@ -222,5 +260,72 @@ _samyTotemTimers:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", function(event)
     _castChangedTime = GetTime()
 end)
 
+local function ResetAllActive()
+    for k, v in pairs(_totemLists) do
+        if (v.isEnabled) then
+            v:ResetActiveTotem()
+        end
+    end
+end
 
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED_INDOORS", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("ZONE_CHANGED_NEW_AREA", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("PLAYER_DEAD", function(event)
+    ResetAllActive()
+end)
+
+_samyTotemTimers:RegisterEvent("GROUP_ROSTER_UPDATE", function(event)
+    SamyTotemTimersWFCom:UpdateGroupRooster()
+end)
+
+_samyTotemTimers:RegisterEvent("CHAT_MSG_ADDON", function(...) SamyTotemTimersWFCom:ChatMessageReceived(...)
+end)
+	-- if(prefix == COMM_PREFIX_OLD ) then -- wf com old API
+	-- 	local commType, expiration, lag, gGUID = strsplit(":", message)
+	-- 	-- local expiration, lag = tonumber(expiration), tonumber(lag)
+	-- 	if(not _wfTotemList[gGUID] ) then 
+    --         return 
+    --     end
+
+    --     print('old', gGUID)
+	-- 	if( commType == "W" ) then -- message w/ wf duration, should always fire on application)
+    --         _wfTotemList[gGUID].duration = 1
+    --         _wfTotemList[gGUID].expirationTime = expiration
+    --         _wfTotemList[gGUID].missingPrereq = false
+	-- 	elseif( commType == "E" ) then -- message wf lost
+    --         _wfTotemList[gGUID].duration = 0
+    --         _wfTotemList[gGUID].expirationTime = 0
+    --         _wfTotemList[gGUID].missingPrereq = false
+	-- 	elseif( commType == "I") then -- message signaling that unit has addon installed
+	-- 		_wfTotemList[gGUID].missingPrereq = false
+	-- 	end
+
+	-- elseif( prefix == COMM_PREFIX ) then --wf com new API
+	-- 	local gGUID, spellID, expiration, lag = strsplit(':', message)
+    --     if(not _wfTotemList[gGUID] ) then 
+    --         return 
+    --     end
+
+	-- 	local spellID, expire, lagHome = tonumber(spellID), tonumber(expiration), tonumber(lagHome)
+	-- 	if spellID then --update buffs
+    --         _wfTotemList[gGUID].duration = 1
+    --         _wfTotemList[gGUID].expirationTime = expire
+    --         _wfTotemList[gGUID].missingPrereq = false
+	-- 	else --if( not spellID ) then --addon installed or buff expired
+    --         _wfTotemList[gGUID].duration = 0
+    --         _wfTotemList[gGUID].expirationTime = 0
+    --         _wfTotemList[gGUID].missingPrereq = false
+	-- 	end
+	-- end
+-- end)
 

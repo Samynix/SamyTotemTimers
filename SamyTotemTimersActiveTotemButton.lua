@@ -36,9 +36,10 @@ local function CreatePulseStatusBar(parentFrame)
     return statusbar
 end
 
-function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId, castTotemButton, isOnlyShowSelectedTotem)
+function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, totemListId, castTotemButton, isOnlyShowSelectedTotem, wfBuffList)
     local templates = "ActionButtonTemplate"
     local instance = SamyTotemTimersButtonBase:Create(parentFrame, "SamyTotemTimers" .. totemListId .. "ActiveTotemButton", templates)
+    instance.wfBuffList = wfBuffList
     instance.pulseStatusBar = CreatePulseStatusBar(instance.frame)
     instance.frame:SetEnabled(false)
     instance.frame.NormalTexture:Hide()
@@ -79,15 +80,16 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     end
 
     local function DoWork()
-        if (not instance.hasTotem) then
-            instance:SetSpell(nil, nil)
-            instance.frame:Hide()
-
+        local duration = instance.duration and instance.duration or 0
+        local startTime = instance.startTime and instance.startTime or 0
+        local timeLeft = duration + startTime - GetTime()
+        if (not instance.hasTotem or timeLeft <= 0) then
+            instance:ResetAndHide()
             C_Timer.NewTimer(0.1, function() DoWork() end)
             return
         end
 
-        local timeLeft = instance.duration + instance.startTime - GetTime()
+        
 
         instance:SetTexture(instance.activeTotem.spellName)
         instance:SetSpell(instance.activeTotem.spellName, instance.activeTotem.elementId, true)
@@ -113,8 +115,6 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
         C_Timer.NewTimer(0.1, function() DoWork() end)
     end
 
-    DoWork()
-
     function instance:UpdateActiveTotemInfo(totemIndexChanged, latency)
         if (not elementTotemDictionary[totemIndexChanged]) then
             return
@@ -133,19 +133,35 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
             end
         end
 
+        instance:ResetAndHide()
+    end
+
+    function instance:ResetAndHide()
+        instance:SetSpell(nil, nil)
         instance.activeTotem = nil
         instance.hasTotem = false
+        instance.frame:Hide()
     end
 
     function instance:UpdateActiveTotemAffectedCount()
         if (instance.spellName) then
             local affected = 0
+            local totalPossible = nil
             local units = { "player", "party1", "party2", "party3", "party4" }
+            if (instance.spellName == "Windfury Totem") then
+                totalPossible = 0
+                for k, v in pairs(instance.wfBuffList) do
+                    if v and v.hasWfCom and v.isRelevant then
+                        totalPossible = totalPossible + 1
+                    end
+                end
+            end
+
             for k, v in pairs(units) do
-                local buffs = SamyTotemTimersUtils:GetUnitBuffs(v)
+                local buffs = SamyTotemTimersUtils:GetUnitBuffs(v, instance.wfBuffList)
                 local foundBuff = false
                 for k2, v2 in pairs(buffs) do
-                    if (string.match(instance.spellName, v2.name)) then
+                    if (v2.isRelevant and string.match(instance.spellName, v2.name) and v2.expirationTime > GetTime()) then
                         affected = affected + 1
                         foundBuff = true
                     end
@@ -160,14 +176,20 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
                 end
             end
 
-            if (affected > 0) then
+            if (affected > 0 or (totalPossible and totalPossible > 0)) then
+                local affectedString = tostring(affected)
+                if (totalPossible) then
+                    affectedString = affectedString .. '/' .. tostring(totalPossible)
+                end
+
                 instance.affectedFontString:Show()
-                instance.affectedFontString:SetText(tostring(affected))
+                instance.affectedFontString:SetText(tostring(affectedString))
             else
                 instance.affectedFontString:Hide()
             end
         end
     end
 
+    DoWork()
     return instance
 end

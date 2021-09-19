@@ -1,12 +1,13 @@
 SamyTotemTimersConfig = {}
 
+SamyTotemTimersConfig.Version = 3.2
 SamyTotemTimersConfig.ONUPDATEDELAY = 0.25
 SamyTotemTimersConfig.PULSESTATUSBARHEIGHT = 15
 SamyTotemTimersConfig.VERTICAL_SPACING = 7
 SamyTotemTimersConfig.HORIZONTAL_SPACING = 10
 SamyTotemTimersConfig.BUTTON_SIZE = 32
 SamyTotemTimersConfig.IS_DEBUG = false
-SamyTotemTimersConfig.PRINT_PREFIX = "|cFF452347SamyTotemTimers:|r"
+SamyTotemTimersConfig.PRINT_PREFIX = "|cFF452347SamyTotemTimers" .. tostring(SamyTotemTimersConfig.Version) .. ":|r"
 
 
 function SamyTotemTimersConfig:GetCastTotemButtonName(totemListId)

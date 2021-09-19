@@ -52,18 +52,35 @@ function SamyTotemTimersUtils:IsSpellsEqual(spellOne, spellTwo)
     return spellOne == spellTwo
 end
 
-function SamyTotemTimersUtils:GetUnitBuffs(unit)
+function SamyTotemTimersUtils:GetUnitBuffs(unit, additionalBuffsByGuid)
     local buffList = {}
+
+    local unitGuid = UnitGUID(unit)
+    if additionalBuffsByGuid and additionalBuffsByGuid[unitGuid] then
+        additionalBuff = additionalBuffsByGuid[unitGuid]
+        table.insert(buffList, 
+        { 
+            ["name"] = 'Windfury Totem',
+            ["duration"] = additionalBuff.duration,
+            ["expirationTime"] = GetTime() + (additionalBuff.expirationTime / 1000),
+            ["unitCaster"] = nil,
+            ["spellId"] = nil,
+            ["isRelevant"] = additionalBuff.isRelevant
+        }) 
+    end
+
     for i=1, 40 do
-        local name, _, _, _, _, duration, expirationTime, unitCaster, _, _, spellId = UnitBuff(unit, i)
+        local name, _, _, _, duration, expirationTime, unitCaster, _, _, spellId = UnitBuff(unit, i)
         if (name) then
+            expirationTime = (expirationTime and expirationTime > 0) and expirationTime or 1000
             table.insert(buffList, 
                 { 
                     ["name"] = name,
                     ["duration"] = duration,
-                    ["expirationTime"] = expirationTime,
+                    ["expirationTime"] = GetTime() + (tonumber(expirationTime) / 1000),
                     ["unitCaster"] = unitCaster,
-                    ["spellId"] = spellId
+                    ["spellId"] = spellId,
+                    ["isRelevant"] = true,
                 }       
             )
         end
