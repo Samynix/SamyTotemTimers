@@ -10,14 +10,6 @@ local _db = nil
 local _samyTotemTimers = nil
 local _isSamyTotemTimersFrameLocked = true
 
-local function IsDoDbVersion(versionNumber)
-    if (SamyTotemTimersDB and (not SamyTotemTimersDB.version or SamyTotemTimersDB.version < versionNumber)) then
-        return true
-    end
-
-    return false
-end
-
 local function EnsureSavedVariablesExists(isReset)
     local function SetDefault(ref, default, isOverride)
         if (ref == nil or isOverride) then
@@ -27,51 +19,7 @@ local function EnsureSavedVariablesExists(isReset)
         return ref
     end
 
-    if (IsDoDbVersion(2.1)) then
-        isReset = true
-        SamyTotemTimersUtils:Print("Current version incompatible with old saved variables, reseting all configuration")
-    end
-
-    if (IsDoDbVersion(2.3)) then
-        SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, true)  
-        SamyTotemTimersUtils:Print("Updated twist totem list with more totems, added order to totemlists")
-    end
-
-    local function postEnsureVariablesExists()
-        --Ensure all totems are in config
-        for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
-            if not SamyTotemTimersDB.totemLists[k] then
-                SamyTotemTimersDB.totemLists[k] = element
-                SamyTotemTimersUtils:Print("Added missing totemlist " .. k)
-            else
-                for k2, totem in pairs(element["totems"]) do
-                    if not SamyTotemTimersDB.totemLists[k]["totems"][k2] then
-                        SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
-                        SamyTotemTimersUtils:Print("Added missing totem " .. k2 .. " to totem list " .. k)
-                    end
-                end
-            end
-        end
-
-        for k, v in pairs(SamyTotemTimersDB.totemLists) do
-            if (v.isShowPulseTimers == nil) then
-                v.isShowPulseTimers = true
-            end
-
-            for k2, v2 in pairs(v.totems) do
-                if (v2.isEnabled == nil) then
-                    v2.isEnabled = true
-                end
-
-                local defaultHasBuff = SamyTotemTimersConfig.defaultTotemLists[k]["totems"][k2]["hasBuff"]
-                if (v2.hasBuff == nil and defaultHasBuff ~= nil) then
-                    v2.hasBuff = defaultHasBuff
-                end
-            end
-        end
-
-        SamyTotemTimersDB.version = 2.4
-    end
+    SamyTotemTimersDbVersion:UpdateDatabase(SamyTotemTimersDB, false, SetDefault)
 
     SamyTotemTimersDB = SetDefault(SamyTotemTimersDB, {}, isReset)
     SamyTotemTimersDB.lastUsedTotems = SetDefault(SamyTotemTimersDB.lastUsedTotems, {}, isReset)
@@ -83,8 +31,37 @@ local function EnsureSavedVariablesExists(isReset)
     SamyTotemTimersDB.position.relativePoint = SetDefault(SamyTotemTimersDB.position.relativePoint, "CENTER", isReset)
     SamyTotemTimersDB.totemLists = SetDefault(SamyTotemTimersDB.totemLists, SamyTotemTimersConfig.defaultTotemLists, isReset)
     
+    --Ensure all totems are in config
+    for k, element in pairs(SamyTotemTimersConfig.defaultTotemLists) do
+        if not SamyTotemTimersDB.totemLists[k] then
+            SamyTotemTimersDB.totemLists[k] = element
+            SamyTotemTimersUtils:Print("Added missing totemlist " .. k)
+        else
+            for k2, totem in pairs(element["totems"]) do
+                if not SamyTotemTimersDB.totemLists[k]["totems"][k2] then
+                    SamyTotemTimersDB.totemLists[k]["totems"][k2] = totem
+                    SamyTotemTimersUtils:Print("Added missing totem " .. k2 .. " to totem list " .. k)
+                end
+            end
+        end
+    end
 
-    postEnsureVariablesExists()
+    for k, v in pairs(SamyTotemTimersDB.totemLists) do
+        if (v.isShowPulseTimers == nil) then
+            v.isShowPulseTimers = true
+        end
+
+        for k2, v2 in pairs(v.totems) do
+            if (v2.isEnabled == nil) then
+                v2.isEnabled = true
+            end
+
+            local defaultHasBuff = SamyTotemTimersConfig.defaultTotemLists[k]["totems"][k2]["hasBuff"]
+            if (v2.hasBuff == nil and defaultHasBuff ~= nil) then
+                v2.hasBuff = defaultHasBuff
+            end
+        end
+    end
 
     return SamyTotemTimersDB
 end
