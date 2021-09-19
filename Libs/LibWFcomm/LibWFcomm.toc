@@ -1,9 +1,0 @@
-## Interface: 11302
-## Title: LibWFcomm
-## Notes: Library for passing duration of Windfury
-## Author: Yotta
-## X-Category: Library
-
-libs\LibStub\LibStub.lua
-
-LibWFcomm.xml

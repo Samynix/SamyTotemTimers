@@ -130,6 +130,7 @@ function _samyTotemTimers:OnInitialize()
     SamyTotemTimersDatabase:RestoreScaleAndPosition()
     self.frame:Show()
 
+    SamyTotemTimersWFCom:UpdateGroupRooster()
     SamyTotemTimersUtils:Print("Loaded")
 end
 
