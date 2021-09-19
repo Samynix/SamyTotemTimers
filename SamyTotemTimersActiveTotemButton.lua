@@ -146,17 +146,24 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
     function instance:UpdateActiveTotemAffectedCount()
         if (instance.spellName) then
             local affected = 0
-            local missingPrereq = 0
+            local totalPossible = nil
             local units = { "player", "party1", "party2", "party3", "party4" }
+            if (instance.spellName == "Windfury Totem") then
+                totalPossible = 0
+                for k, v in pairs(instance.wfBuffList) do
+                    if v and v.hasWfCom and v.isRelevant then
+                        totalPossible = totalPossible + 1
+                    end
+                end
+            end
+
             for k, v in pairs(units) do
                 local buffs = SamyTotemTimersUtils:GetUnitBuffs(v, instance.wfBuffList)
                 local foundBuff = false
                 for k2, v2 in pairs(buffs) do
-                    if (string.match(instance.spellName, v2.name) and not v2.missingPrereq and v2.expirationTime > GetTime()) then
+                    if (v2.isRelevant and string.match(instance.spellName, v2.name) and v2.expirationTime > GetTime()) then
                         affected = affected + 1
                         foundBuff = true
-                    elseif (v2.missingPrereq) then
-                        missingPrereq = missingPrereq + 1
                     end
                 end
 
@@ -169,10 +176,10 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
                 end
             end
 
-            if (affected > 0) then
+            if (affected > 0 or (totalPossible and totalPossible > 0)) then
                 local affectedString = tostring(affected)
-                if (missingPrereq > 0) then
-                    affectedString = affectedString .. '/' .. "|cFFFF0000" .. tostring(missingPrereq)
+                if (totalPossible) then
+                    affectedString = affectedString .. '/' .. tostring(totalPossible)
                 end
 
                 instance.affectedFontString:Show()
