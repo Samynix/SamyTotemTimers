@@ -2,6 +2,7 @@
 ..\FrameXML\UI.xsd">
     <Script file="SamyTotemTimersUtils.lua"/>
 	<Script file="SamyTotemTimersConfig.lua"/>
+    <script file="SamyTotemTimersDbVersion.lua"/>
     <script file="SamyTotemTimersDb.lua"/>
     <Script file="SamyTotemTimersButtonBase.lua"/>  
     <Script file="SamyTotemTimersSelectTotemButton.lua"/>
