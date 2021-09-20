@@ -62,7 +62,7 @@ function SamyTotemTimersUtils:GetUnitBuffs(unit, additionalBuffsByGuid)
         { 
             ["name"] = 'Windfury Totem',
             ["duration"] = additionalBuff.duration,
-            ["expirationTime"] = GetTime() + (additionalBuff.expirationTime / 1000),
+            ["expirationTime"] = additionalBuff.expirationTime,
             ["unitCaster"] = nil,
             ["spellId"] = nil,
             ["isRelevant"] = additionalBuff.isRelevant

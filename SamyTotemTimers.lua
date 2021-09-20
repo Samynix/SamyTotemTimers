@@ -174,47 +174,14 @@ function _samyTotemTimers:OnUpdate(elapsed)
     end
 
 
-    SamyTotemTimersWFCom:UpdatePlayer()
+    SamyTotemTimersWFCom:OnUpdate()
     _timeSinceLastUpdate = 0
     for k, v in pairs(_totemLists) do
         v:UpdateActiveTotemAffectedCount()
     end
 end
 
--- function _samyTotemTimers:UpdateGroupRooster()
---     local function addPlayerData(unitId)
---         local playerGuid = UnitGUID(unitId)
---         if not playerGuid then
---             return nil
---         end
-        
---         local _, unitClass = UnitClass(unitId)
---         _wfTotemList[playerGuid] = 
---         {
---             guid = playerGuid,
---             missingPrereq = SamyTotemTimersDB.wfComClass[unitClass],
---             expirationTime = 0,
---             duration = 0
---         }
 
---         return playerGuid
---     end
-    
---     local unitGuids = {}
---     unitGuids[addPlayerData("player")] = true
---     for index=1,4 do
---         local guid = addPlayerData("party" .. index)
---         if (guid) then
---             unitGuids[guid] = true
---         end
---     end
-
---     for k, v in pairs(_wfTotemList) do
---         if (not unitGuids[k]) then 
---             _wfTotemList[k] = nil
---         end
---     end
--- end
 
 _samyTotemTimers:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", function()
     for k, v in pairs(_totemLists) do
