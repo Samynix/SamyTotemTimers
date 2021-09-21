@@ -9,6 +9,7 @@ local  _wfTotemList = {}
 local _isUpdateTotemLists = false
 local _timeSinceLastUpdate = 0
 local _castChangedTime = nil
+local _currentZone = nil
 
 local function IsPlayerShaman()
     local localizedClass, englishClass, classIndex = UnitClass("player");
@@ -131,6 +132,7 @@ function _samyTotemTimers:OnInitialize()
     self.frame:Show()
 
     SamyTotemTimersWFCom:UpdateGroupRooster()
+    _currentZone = GetZoneText()
     SamyTotemTimersUtils:Print("Loaded")
 end
 
@@ -235,15 +237,37 @@ local function ResetAllActive()
     end
 end
 
+local function HasChangedZone()
+    local currentZone = GetZoneText()
+    if (_currentZone ~= currentZone) then
+        _currentZone = currentZone
+        return true
+    end
+
+    return false
+end
+
 _samyTotemTimers:RegisterEvent("ZONE_CHANGED", function(event)
+    if (not HasChangedZone()) then
+        return
+    end
+
     ResetAllActive()
 end)
 
 _samyTotemTimers:RegisterEvent("ZONE_CHANGED_INDOORS", function(event)
+    if (not HasChangedZone()) then
+        return
+    end
+
     ResetAllActive()
 end)
 
 _samyTotemTimers:RegisterEvent("ZONE_CHANGED_NEW_AREA", function(event)
+    if (not HasChangedZone()) then
+        return
+    end
+
     ResetAllActive()
 end)
 
@@ -257,42 +281,3 @@ end)
 
 _samyTotemTimers:RegisterEvent("CHAT_MSG_ADDON", function(...) SamyTotemTimersWFCom:ChatMessageReceived(...)
 end)
-	-- if(prefix == COMM_PREFIX_OLD ) then -- wf com old API
-	-- 	local commType, expiration, lag, gGUID = strsplit(":", message)
-	-- 	-- local expiration, lag = tonumber(expiration), tonumber(lag)
-	-- 	if(not _wfTotemList[gGUID] ) then 
-    --         return 
-    --     end
-
-    --     print('old', gGUID)
-	-- 	if( commType == "W" ) then -- message w/ wf duration, should always fire on application)
-    --         _wfTotemList[gGUID].duration = 1
-    --         _wfTotemList[gGUID].expirationTime = expiration
-    --         _wfTotemList[gGUID].missingPrereq = false
-	-- 	elseif( commType == "E" ) then -- message wf lost
-    --         _wfTotemList[gGUID].duration = 0
-    --         _wfTotemList[gGUID].expirationTime = 0
-    --         _wfTotemList[gGUID].missingPrereq = false
-	-- 	elseif( commType == "I") then -- message signaling that unit has addon installed
-	-- 		_wfTotemList[gGUID].missingPrereq = false
-	-- 	end
-
-	-- elseif( prefix == COMM_PREFIX ) then --wf com new API
-	-- 	local gGUID, spellID, expiration, lag = strsplit(':', message)
-    --     if(not _wfTotemList[gGUID] ) then 
-    --         return 
-    --     end
-
-	-- 	local spellID, expire, lagHome = tonumber(spellID), tonumber(expiration), tonumber(lagHome)
-	-- 	if spellID then --update buffs
-    --         _wfTotemList[gGUID].duration = 1
-    --         _wfTotemList[gGUID].expirationTime = expire
-    --         _wfTotemList[gGUID].missingPrereq = false
-	-- 	else --if( not spellID ) then --addon installed or buff expired
-    --         _wfTotemList[gGUID].duration = 0
-    --         _wfTotemList[gGUID].expirationTime = 0
-    --         _wfTotemList[gGUID].missingPrereq = false
-	-- 	end
-	-- end
--- end)
-
