@@ -1,6 +1,6 @@
 SamyTotemTimersConfig = {}
 
-SamyTotemTimersConfig.Version = 3.2
+SamyTotemTimersConfig.Version = "3.2.3"
 SamyTotemTimersConfig.ONUPDATEDELAY = 0.25
 SamyTotemTimersConfig.PULSESTATUSBARHEIGHT = 15
 SamyTotemTimersConfig.VERTICAL_SPACING = 7
