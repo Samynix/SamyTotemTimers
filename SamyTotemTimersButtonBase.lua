@@ -82,6 +82,10 @@ function SamyTotemTimersButtonBase:Create(parentFrame, frameName, templates)
         instance.frame:SetPoint("LEFT", parentFrame, "LEFT", x, y);
     end
 
+    function instance:ResetAndHide()
+
+    end
+
     function instance:SetVisibility(isVisible)
         if (isVisible) then
             instance.frame:Show()
