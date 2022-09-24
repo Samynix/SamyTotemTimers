@@ -123,8 +123,7 @@ function SamyTotemTimersActiveTotemButton:Create(parentFrame, availableTotems, t
         for k, v in pairs(elementTotemDictionary[totemIndexChanged]) do
             local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(totemIndexChanged)
             local isSelectedTotem = SamyTotemTimersUtils:IsSpellsEqual(castTotemButton.spellName, v.spellName)
-    
-            if (haveTotem and string.match(totemName, v.spellName) and (not isOnlyShowSelectedTotem or isSelectedTotem)) then
+            if (v.spellName and haveTotem and string.match(totemName, v.spellName) and (not isOnlyShowSelectedTotem or isSelectedTotem)) then
                 instance.activeTotem = v
                 instance.hasTotem = true
                 instance.startTime = startTime + latency
