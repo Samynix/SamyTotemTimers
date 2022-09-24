@@ -203,8 +203,26 @@ local function MeasureLatency()
     return delay
 end
 
+
+
 _samyTotemTimers:RegisterEvent("PLAYER_TOTEM_UPDATE", function(self, totemIndex)
     local latency = MeasureLatency()
+    local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(totemIndex)
+    if totemIndex == 3 then
+        if haveTotem and totemName == "Mana Tide Totem" then
+            SendChatMessage("STARTED: Mana tide totem", "PARTY", "Common", "PARTY")
+            _samyTotemTimers.lastTotem = totemName
+        elseif _samyTotemTimers.lastTotem == "Mana Tide Totem" and haveTotem == false then
+            SendChatMessage("ENDED: Mana tide totem", "PARTY", "Common", "PARTY")
+        end
+
+        if haveTotem == false then
+            _samyTotemTimers.lastTotem = nil
+        end
+    end
+ 
+
+
     for k, v in pairs(_totemLists) do
         if (v.isEnabled) then
             v:UpdateActiveTotemInfo(totemIndex, latency)
