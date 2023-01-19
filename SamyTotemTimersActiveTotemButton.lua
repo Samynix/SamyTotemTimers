@@ -6,7 +6,7 @@ local function CreateMissingBuffOverlay(parentFrame)
     frame:SetWidth(parentFrame:GetWidth()) 
     frame:SetHeight(parentFrame:GetHeight())
 
-    local texture = frame:CreateTexture(nil,"TOOLTIP")
+    local texture = frame:CreateTexture(nil,"OVERLAY")
     texture:SetColorTexture(1, 0, 0, 0.4)
     texture:SetAllPoints(frame)
     frame.texture = texture

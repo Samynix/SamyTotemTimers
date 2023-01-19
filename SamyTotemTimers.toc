@@ -1,5 +1,5 @@
-## Interface: 30400
-## Version: v3.2.5
+## Interface: 30401
+## Version: v3.2.6
 ## Title: SamyTotemTimers
 ## Notes: Stuffs
 ## SavedVariablesPerCharacter: SamyTotemTimersDB
